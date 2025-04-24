@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JaKaStyle - Administración de Usuarios</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #34495e;
+      --accent-color: #3498db;
+      --light-color: #ecf0f1;
+      --dark-color: #2c3e50;
+    }
+    
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .sidebar {
+      min-height: calc(100vh - 56px);
+      background-color: var(--primary-color);
+      color: white;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    }
+    
+    .sidebar .nav-link {
+      color: rgba(255, 255, 255, 0.8);
+      padding: 12px 20px;
+      margin: 2px 0;
+      border-radius: 4px;
+      transition: all 0.3s;
+    }
+    
+    .sidebar .nav-link:hover {
+      color: #fff;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar .nav-link.active {
+      color: #fff;
+      background-color: var(--accent-color);
+    }
+    
+    .sidebar .nav-link i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+    
+    .content {
+      padding: 25px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .card-header {
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: 500;
+    }
+    
+    .table-responsive {
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .table thead {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+    
+    .table th {
+      font-weight: 500;
+      padding: 12px 15px;
+    }
+    
+    .table td {
+      padding: 12px 15px;
+      vertical-align: middle;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+    
+    .action-buttons .btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+    
+    .search-container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .alert {
+      border-radius: 6px;
+    }
+    
+    .pagination .page-item .page-link {
+      color: var(--primary-color);
+    }
+    
+    .pagination .page-item.active .page-link {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    
+    .btn-primary {
+      background-color: var(--accent-color);
+      border-color: var(--accent-color);
+    }
+    
+    .btn-primary:hover {
+      background-color: #2980b9;
+      border-color: #2980b9;
+    }
+    
+    .user-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .badge-admin {
+      background-color: #e74c3c;
+      color: white;
+    }
+    
+    .badge-user {
+      background-color: #2ecc71;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--dark-color);">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="#">
+      <i class="fas fa-hat-cowboy me-2"></i>JaKaStyle
+    </a>
+    <div class="d-flex align-items-center">
+      <div class="dropdown">
+        <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button"
+           data-bs-toggle="dropdown">
+          <i class="fas fa-user-circle me-1"></i>
+          <span th:text="${#authentication.name}">Usuario</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" href="#"><i class="fas fa-user-cog me-2"></i> Perfil</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <form th:action="@{/usuarios/logout}" method="post" class="dropdown-item p-0">
+              <button type="submit" class="btn btn-link text-decoration-none w-100 text-start px-3 py-2">
+                  <i class="fas fa-sign-out-alt me-2"></i> Cerrar sesión
+              </button>
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+          </form>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+      <div class="position-sticky pt-3">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/admin/dashboard}">
+              <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/admin/productos}">
+              <i class="fas fa-hat-cowboy"></i> Gorras
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/admin/ordenes}">
+              <i class="fas fa-clipboard-list"></i> Órdenes
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" th:href="@{/admin/usuarios}">
+              <i class="fas fa-users"></i> Usuarios
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0" style="color: var(--dark-color);">
+          <i class="fas fa-users me-2"></i>Administración de Usuarios
+        </h2>
+        <a th:href="@{/admin/usuarios/add}" class="btn btn-primary">
+          <i class="fas fa-user-plus me-2"></i>Agregar Usuario
+        </a>
+      </div>
+
+      <!-- Alertas -->
+      <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i> <span th:text="${success}">Operación exitosa</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i> <span th:text="${error}">Error en la operación</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+
+      <!-- Filtros -->
+      <div class="search-container mb-4">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="Buscar usuarios..." id="searchUserInput">
+              <button class="btn btn-outline-secondary" type="button">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <select class="form-select" id="rolFilter">
+              <option value="">Todos los roles</option>
+              <option value="ROLE_USUARIO">Usuario</option>
+              <option value="ROLE_ADMIN">Administrador</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla de Usuarios -->
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>Usuario</th>
+              <th>Rol</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="usuario : ${usuarios}">
+              <td th:text="${usuario.id}">1</td>
+              <td>
+                <strong th:text="${usuario.nombre + ' ' + usuario.apellido}"></strong>
+                <div class="text-muted small" th:text="${usuario.contacto}"></div>
+              </td>
+              <td th:text="${usuario.email}">admin@gorrapro.com</td>
+              <td th:text="${usuario.nombreUsuario}">admin</td>
+              <td>
+                <span th:classappend="${usuario.rol.nombreRol == 'ROLE_ADMIN'} ? 'badge-admin' : 'badge-user'" 
+                      class="user-badge">
+                  <span th:text="${usuario.rol.nombreRol == 'ROLE_ADMIN'} ? 'Admin' : 'Usuario'"></span>
+                </span>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <a th:href="@{/admin/usuarios/edit/{id}(id=${usuario.id})}" class="btn btn-sm btn-primary" title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <a href="#" class="btn btn-sm btn-danger" 
+                     th:data-id="${usuario.id}"
+                     th:data-name="${usuario.nombre + ' ' + usuario.apellido}"
+                     data-bs-toggle="modal" 
+                     data-bs-target="#confirmDeleteModal"
+                     title="Eliminar">
+                    <i class="fas fa-trash-alt"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación -->
+      <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+          <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1">Anterior</a>
+          </li>
+          <li class="page-item active"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item">
+            <a class="page-link" href="#">Siguiente</a>
+          </li>
+        </ul>
+      </nav>
+    </main>
+  </div>
+</div>
+
+<!-- Modales (se mantienen igual) -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Confirmar Eliminación</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="deleteMessage">¿Estás seguro de que deseas eliminar este usuario?</p>
+        <p class="text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="hideModal()">Cancelar</button>
+        <form id="deleteForm" method="post">
+          <input type="hidden" name="_method" value="delete">
+          <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Filtrar usuarios por nombre o email
+  document.getElementById('searchUserInput').addEventListener('keyup', function() {
+    let filter = this.value.toLowerCase();
+    let table = document.querySelector('table');
+    let tr = table.getElementsByTagName('tr');
+
+    for (let i = 1; i < tr.length; i++) {
+      let tdNombre = tr[i].getElementsByTagName('td')[1];
+      let tdEmail = tr[i].getElementsByTagName('td')[2];
+
+      if (tdNombre && tdEmail) {
+        let txtNombre = tdNombre.textContent || tdNombre.innerText;
+        let txtEmail = tdEmail.textContent || tdEmail.innerText;
+
+        if (txtNombre.toLowerCase().indexOf(filter) > -1 || txtEmail.toLowerCase().indexOf(filter) > -1) {
+          tr[i].style.display = '';
+        } else {
+          tr[i].style.display = 'none';
+        }
+      }
+    }
+  });
+
+  // Filtrar por rol
+  document.getElementById('rolFilter').addEventListener('change', function() {
+    let filterValue = this.value;
+    let table = document.querySelector('table');
+    let tr = table.getElementsByTagName('tr');
+
+    for (let i = 1; i < tr.length; i++) {
+        let tdRol = tr[i].getElementsByTagName('td')[4];
+        
+        if (tdRol) {
+            let badge = tdRol.querySelector('.user-badge span');
+            let userRole = badge.textContent.trim() === 'Admin' ? 'ROLE_ADMIN' : 'ROLE_USUARIO';
+            
+            if (filterValue === '' || userRole === filterValue) {
+                tr[i].style.display = '';
+            } else {
+                tr[i].style.display = 'none';
+            }
+        }
+    }
+});
+
+  // Configuración del modal de eliminación
+  document.getElementById('confirmDeleteModal').addEventListener('show.bs.modal', function(event) {
+    const button = event.relatedTarget;
+    const userId = button.getAttribute('data-id');
+    const userName = button.getAttribute('data-name');
+    
+    document.getElementById('deleteMessage').textContent = 
+      `¿Estás seguro de eliminar al usuario ${userName}?`;
+    document.getElementById('deleteForm').action = `/admin/usuarios/eliminar/${userId}`;
+  });
+
+  function hideModal() {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('confirmDeleteModal'));
+    modal.hide();
+  }
+</script>
+</body>
+</html>

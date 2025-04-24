@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Perfil | JaKaStyle</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --dark-bg: #121212;
+            --dark-secondary: #1e1e1e;
+            --neon-blue: #00f7ff;
+            --neon-blue-glow: 0 0 10px #00f7ff, 0 0 20px #00f7ff;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .edit-card {
+            background-color: var(--dark-secondary);
+            border: 2px solid var(--neon-blue);
+            border-radius: 15px;
+            box-shadow: var(--neon-blue-glow);
+            padding: 2rem;
+        }
+
+        .form-label {
+            color: var(--neon-blue);
+            font-weight: 500;
+        }
+
+        .btn-neon {
+            background: transparent;
+            color: var(--neon-blue);
+            border: 2px solid var(--neon-blue);
+            transition: all 0.3s;
+            padding: 0.75rem 2rem;
+        }
+
+        .btn-neon:hover {
+            background: var(--neon-blue);
+            color: var(--dark-bg);
+            box-shadow: var(--neon-blue-glow);
+        }
+
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark-secondary fixed-top">
+    <div class="container">
+        <a class="navbar-brand neon-text" th:href="@{/}">JaKaStyle</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/productos/productos_usuarios}">Productos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Contacto</a>
+                </li>
+            </ul>
+            <div class="d-flex align-items-center">
+                <div sec:authorize="isAuthenticated()" class="me-3">
+                    <a th:href="@{/carrito}" class="btn btn-neon position-relative">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span th:if="${carritoCount}" class="position-absolute top-0 start-100 translate-middle badge bg-danger" th:text="${carritoCount}"></span>
+                    </a>
+                </div>
+                <div class="dropdown" sec:authorize="isAuthenticated()">
+                    <button class="btn btn-neon dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user me-2"></i><span sec:authentication="name"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end bg-dark-secondary">
+                        <li><a class="dropdown-item text-white" th:href="@{/usuarios/perfil}">Perfil</a></li>
+                        <li><a class="dropdown-item text-white" th:href="@{/carrito}">Carrito</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" th:href="@{/usuarios/logout}">Cerrar Sesión</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<main class="container mt-5 pt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-6">
+            <div class="edit-card">
+                <h2 class="text-center mb-4" style="color: var(--neon-blue);">Editar Perfil</h2>
+
+                <!-- Alertas -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                    <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <form th:action="@{/usuarios/actualizar}" method="post" th:object="${usuario}">
+                    <input type="hidden" name="_csrf" th:value="${_csrf.token}" /> <!-- Añadir esto -->
+                    <input type="hidden" name="_method" value="PUT"/> <!-- Campo clave -->
+                    <input type="hidden" th:field="*{id}" />
+                    <input type="hidden" th:field="*{rol.id}" />
+
+                    <!-- Nombre -->
+                    <div class="mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input type="text"
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid'"
+                               th:field="*{nombre}"
+                               required>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('nombre')}">
+                            <span th:errors="*{nombre}"></span>
+                        </div>
+                    </div>
+
+                    <!-- Apellido -->
+                    <div class="mb-3">
+                        <label class="form-label">Apellido</label>
+                        <input type="text"
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('apellido')} ? 'is-invalid'"
+                               th:field="*{apellido}"
+                               required>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('apellido')}">
+                            <span th:errors="*{apellido}"></span>
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email"
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
+                               th:field="*{email}"
+                               pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+                               required>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}">
+                            <span th:errors="*{email}"></span>
+                        </div>
+                    </div>
+
+                    <!-- Nombre de Usuario -->
+                    <div class="mb-3">
+                        <label class="form-label">Usuario</label>
+                        <input type="text"
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('nombreUsuario')} ? 'is-invalid'"
+                               th:field="*{nombreUsuario}"
+                               required>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('nombreUsuario')}">
+                            <span th:errors="*{nombreUsuario}"></span>
+                        </div>
+                    </div>
+
+                    <!-- Teléfono -->
+                    <div class="mb-3">
+                        <label class="form-label">Teléfono</label>
+                        <input type="tel"
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('contacto')} ? 'is-invalid'"
+                               th:field="*{contacto}"
+                               pattern="[0-9]{7,15}"
+                               required>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('contacto')}">
+                            <span th:errors="*{contacto}"></span>
+                        </div>
+                    </div>
+
+                    <!-- Dirección -->
+                    <div class="mb-3">
+                        <label class="form-label">Dirección</label>
+                        <input type="text"
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('direccion')} ? 'is-invalid'"
+                               th:field="*{direccion}"
+                               minlength="10"
+                               required>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('direccion')}">
+                            <span th:errors="*{direccion}"></span>
+                        </div>
+                    </div>
+
+                    <!-- Nueva Contraseña -->
+                    <div class="mb-3">
+                        <label class="form-label">Nueva Contraseña (opcional)</label>
+                        <input type="password"
+                               class="form-control"
+                               name="newPassword"
+                               placeholder="Dejar en blanco para no cambiar">
+                        <small class="form-text text-muted">Mínimo 8 caracteres</small>
+                    </div>
+
+                    <!-- Confirmar Contraseña -->
+                    <div class="mb-4">
+                        <label class="form-label">Confirmar Contraseña</label>
+                        <input type="password"
+                               class="form-control"
+                               name="confirmPassword"
+                               placeholder="Repite la nueva contraseña">
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a th:href="@{/usuarios/perfil}" class="btn btn-neon">Cancelar</a>
+                        <button type="submit" class="btn btn-neon" id="submitBtn">
+                            <span class="spinner-border spinner-border-sm d-none" id="spinner"></span>
+                            <span id="btnText">Guardar Cambios</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.getElementById('editForm').addEventListener('submit', function(e) {
+        const newPassword = document.querySelector('input[name="newPassword"]').value;
+        const confirmPassword = document.querySelector('input[name="confirmPassword"]').value;
+
+        if (newPassword && newPassword !== confirmPassword) {
+            e.preventDefault();
+            showMessage('Las contraseñas no coinciden', 'danger');
+            return;
+        }
+
+        const btn = document.getElementById('submitBtn');
+        const spinner = document.getElementById('spinner');
+        const btnText = document.getElementById('btnText');
+
+        btn.disabled = true;
+        spinner.classList.remove('d-none');
+        btnText.textContent = 'Guardando...';
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        if(urlParams.has('success')) {
+            showMessage(urlParams.get('success'), 'success');
+        }
+        if(urlParams.has('error')) {
+            showMessage(urlParams.get('error'), 'danger');
+        }
+    });
+
+    function showMessage(text, type) {
+        const container = document.createElement('div');
+        container.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show">
+                ${text}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        document.querySelector('main').prepend(container);
+    }
+</script>
+</body>
+</html>

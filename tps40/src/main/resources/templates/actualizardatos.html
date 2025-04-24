@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - JaKaStyle</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --accent-color: #e74c3c;
+            --text-color: #333;
+            --border-color: #e1e5ee;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: var(--text-color);
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+        }
+
+        .profile-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .profile-sidebar {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 30px;
+            height: 100%;
+        }
+
+        .profile-content {
+            padding: 30px;
+        }
+
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            margin-bottom: 20px;
+        }
+
+        .nav-pills .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+
+        .nav-pills .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-weight: 500;
+        }
+
+        .nav-pills .nav-link:hover:not(.active) {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-pills .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 25px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background-color: var(--secondary-color);
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 10px 25px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--dark-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert {
+            border-radius: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .profile-sidebar {
+                padding: 20px;
+            }
+            .profile-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" th:href="@{/}" style="color: var(--primary-color);">JaKaStyle</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/productos/productos_usuarios}"><i class="fas fa-store me-1"></i> Productos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fas fa-phone-alt me-1"></i> Contáctanos</a>
+                </li>
+            </ul>
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <a th:href="@{/carrito}" class="btn btn-outline-secondary position-relative">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span th:if="${carritoCount}" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" th:text="${carritoCount}"></span>
+                    </a>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
+                        <i class="fas fa-user me-1"></i> <span th:text="${usuario.nombreUsuario}"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" th:href="@{/usuarios/perfil}"><i class="fas fa-user me-1"></i> Mi Perfil</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" th:href="@{/usuarios/logout}"><i class="fas fa-sign-out-alt me-1"></i> Cerrar Sesión</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<div class="container-fluid py-4">
+    <div class="profile-container">
+        <div class="row g-0">
+            <!-- Sidebar -->
+            <div class="col-lg-3">
+                <div class="profile-sidebar">
+                    <div class="text-center">
+                        <img src="https://ui-avatars.com/api/?name=${usuario.nombre}+${usuario.apellido}&background=random" alt="Foto de perfil" class="profile-img">
+                        <h4 th:text="${usuario.nombre + ' ' + usuario.apellido}"></h4>
+                        <p class="text-muted mb-4" th:text="${usuario.email}"></p>
+                    </div>
+                    <ul class="nav nav-pills flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" th:href="@{/usuarios/perfil}">
+                                <i class="fas fa-user"></i> Mi Perfil
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-shopping-bag"></i> Mis Pedidos
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Content -->
+            <div class="col-lg-9">
+                <div class="profile-content">
+                    <!-- Alertas -->
+                    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                        <span th:text="${success}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <span th:text="${error}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    
+                    <h2 class="section-title">Actualizar Mis Datos</h2>
+                    
+                    <form th:action="@{/usuarios/actualizar}" th:object="${usuario}" method="post">
+                        <input type="hidden" th:field="*{id}" />
+                        <input type="hidden" th:field="*{rol}" />
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="nombre" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="nombre" th:field="*{nombre}" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="apellido" class="form-label">Apellido</label>
+                                <input type="text" class="form-control" id="apellido" th:field="*{apellido}" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('apellido')}" th:errors="*{apellido}"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Correo Electrónico</label>
+                                <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="nombreUsuario" class="form-label">Nombre de Usuario</label>
+                                <input type="text" class="form-control" id="nombreUsuario" th:field="*{nombreUsuario}" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('nombreUsuario')}" th:errors="*{nombreUsuario}"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="contacto" class="form-label">Teléfono de Contacto</label>
+                                <input type="text" class="form-control" id="contacto" th:field="*{contacto}" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('contacto')}" th:errors="*{contacto}"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="direccion" class="form-label">Dirección</label>
+                                <input type="text" class="form-control" id="direccion" th:field="*{direccion}" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('direccion')}" th:errors="*{direccion}"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="newPassword" class="form-label">Nueva Contraseña (opcional)</label>
+                                <input type="password" class="form-control" id="newPassword" name="newPassword">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="confirmPassword" class="form-label">Confirmar Nueva Contraseña</label>
+                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword">
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

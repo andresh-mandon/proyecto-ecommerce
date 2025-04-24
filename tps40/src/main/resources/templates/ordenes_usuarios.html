@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Pedidos - JakaStyle</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Estilos personalizados */
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .navbar-custom {
+            background-color: #1a1a1a;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .order-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+
+        .order-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .status-badge {
+            font-size: 0.85rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+
+        .product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .sidebar-menu {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .total-price {
+            font-size: 1.25rem;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar completo -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-hat-cowboy"></i> JakaStyle
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-2"></i>
+                        <span th:text="${usuario.nombre + ' ' + usuario.apellido}">Usuario</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" th:href="@{/usuario/perfil}"><i class="fas fa-user me-2"></i>Mi Perfil</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" th:href="@{/logout}"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Contenido principal -->
+<div class="container py-5">
+    <div class="row g-4">
+        <!-- Menú lateral -->
+        <div class="col-lg-3">
+            <div class="sidebar-menu">
+                <h5 class="mb-3">Mi Cuenta</h5>
+                <div class="list-group">
+                    <a th:href="@{/usuario/perfil}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-user me-2"></i>Perfil
+                    </a>
+                    <a th:href="@{/usuario/ordenes}" class="list-group-item list-group-item-action active">
+                        <i class="fas fa-shopping-bag me-2"></i>Mis Pedidos
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Listado de órdenes -->
+        <div class="col-lg-9">
+            <h2 class="mb-4">Historial de Pedidos</h2>
+
+            <!-- Mensaje para carrito vacío -->
+            <div th:if="${#lists.isEmpty(ordenes)}" class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                No se encontraron pedidos realizados
+            </div>
+
+            <!-- Tarjetas de pedidos -->
+            <div th:each="orden : ${ordenes}" class="order-card">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="fw-bold me-2">Pedido #<span th:text="${orden.id}"></span></span>
+                        <small class="text-muted" th:text="${#temporals.format(orden.fechaCreacion, 'dd/MM/yyyy HH:mm')}"></small>
+                    </div>
+                    <span th:classappend="${orden.estado.name() == 'PENDIENTE' ? 'bg-warning' :
+                                            orden.estado.name() == 'ENVIADO' ? 'bg-info' :
+                                            orden.estado.name() == 'ENTREGADO' ? 'bg-success' : 'bg-danger'}"
+                          class="status-badge text-white"
+                          th:text="${orden.estado}">
+                        </span>
+                </div>
+
+                <div class="card-body">
+                    <!-- Dirección de envío -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i>Dirección de entrega</h6>
+                        <p class="mb-0" th:text="${orden.direccionEnvio}"></p>
+                    </div>
+
+                    <!-- Productos -->
+                    <h6 class="fw-bold mb-3"><i class="fas fa-box-open me-2"></i>Productos</h6>
+                    <div th:each="item : ${orden.items}" class="d-flex align-items-center mb-3">
+                        <img th:src="@{/uploads/{imagen}(imagen=${item.producto.imagen})}"
+                             class="product-image me-3"
+                             alt="Producto"
+                             onerror="this.src='/static/images/placeholder.png'">
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1" th:text="${item.producto.nombre}"></h6>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="text-muted me-3" th:text="'Cantidad: ' + ${item.cantidad}"></span>
+                                    <span class="text-muted" th:text="'Precio unitario: $' + ${#numbers.formatDecimal(item.precioUnitario, 1, 'COMMA', 2, 'POINT')}"></span>
+                                </div>
+                                <span class="fw-bold" th:text="'$' + ${#numbers.formatDecimal(item.subtotal, 1, 'COMMA', 2, 'POINT')}"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total del pedido -->
+                    <div class="border-top pt-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="total-price">Total del pedido:</span>
+                            <span class="total-price" th:text="'$' + ${#numbers.formatDecimal(orden.total, 1, 'COMMA', 2, 'POINT')}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Acciones -->
+                <div class="card-footer bg-white">
+                    <button th:if="${orden.estado.name() == 'PENDIENTE'}"
+                            class="btn btn-outline-danger btn-sm"
+                            th:data-order-id="${orden.id}"
+                            onclick="cancelarOrden(this)">
+                        <i class="fas fa-ban me-2"></i>Cancelar Pedido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Función para cancelar pedidos
+    function cancelarOrden(button) {
+        const orderId = button.getAttribute('data-order-id');
+        if (confirm('¿Estás seguro de que deseas cancelar este pedido?')) {
+            fetch(`/ordenes/${orderId}/cancelar`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        button.closest('.order-card').remove();
+                        showToast('Pedido cancelado exitosamente', 'success');
+                    } else {
+                        showToast('Error al cancelar el pedido', 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Error en la conexión', 'danger');
+                });
+        }
+    }
+
+    // Sistema de notificaciones
+    function showToast(message, type) {
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-white bg-${type} border-0`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+
+        toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+
+        document.body.appendChild(toast);
+        new bootstrap.Toast(toast, { autohide: true, delay: 3000 }).show();
+        setTimeout(() => toast.remove(), 3500);
+    }
+</script>
+</body>
+</html>

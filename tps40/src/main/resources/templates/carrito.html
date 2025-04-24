@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>Carrito de Compras - JakaStyle</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background-color: #000 !important;
+            box-shadow: 0 2px 10px rgba(0, 195, 255, 0.2);
+        }
+
+        .navbar-brand {
+            color: white !important;
+            font-weight: bold;
+        }
+
+        .nav-link {
+            color: white !important;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #0d6efd !important;
+        }
+
+        .cart-icon {
+            font-size: 1.2rem;
+            color: #00c3ff !important;
+            /* Mantener el carrito azul */
+        }
+
+        .btn-cuenta {
+            /* Estilo específico para el botón Cuenta */
+            background-color: transparent;
+            color: white !important;
+            border: none; /* Se eliminó el borde */
+            border-radius: 30px;
+            padding: 8px 20px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .btn-cuenta:hover {
+            background-color: white;
+            color: #1e1e1e !important;
+            box-shadow: none;
+            /* Quitar sombra al hacer hover si no se desea */
+        }
+
+        .btn-neon {
+            /* Estilo para el botón "Explorar productos" */
+            background-color: transparent;
+            color: #00c3ff !important;
+            border: 2px solid #00c3ff;
+            border-radius: 30px;
+            padding: 8px 20px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .btn-neon:hover {
+            background-color: #00c3ff;
+            color: #1e1e1e !important;
+            box-shadow: 0 0 15px rgba(0, 195, 255, 0.5);
+        }
+
+        .card {
+            background-color: #252525;
+            border: 1px solid #333;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+
+        .card-header {
+            background-color: #333;
+            border-bottom: 1px solid #444;
+            color: white; /* Cambiado a blanco */
+            font-weight: bold;
+        }
+
+        .card-body h5,
+        .card-body p {
+            color: white !important;
+        }
+
+        .product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #444;
+            transition: transform 0.3s;
+        }
+
+        .product-image:hover {
+            transform: scale(1.05);
+        }
+
+        .item-row {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #333;
+        }
+
+        .item-row:last-child {
+            border-bottom: none;
+        }
+
+        .quantity-control {
+            width: 100px;
+            background-color: #333;
+            border-radius: 25px;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .quantity-btn {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #444;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 0.8rem;
+        }
+
+        .quantity-btn:hover {
+            background-color: #00c3ff;
+            color: #1e1e1e;
+        }
+
+        .quantity-display {
+            font-weight: bold;
+            color: white; /* Cambiado a blanco */
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-cart i {
+            font-size: 5rem;
+            color: #00c3ff;
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+
+        .empty-cart h2,
+        .empty-cart p {
+            color: white !important;
+        }
+
+        .empty-cart .btn-neon {
+            color: #00c3ff !important;
+        }
+
+        .summary-card {
+            position: sticky;
+            top: 20px;
+        }
+
+        .price {
+            color: white; /* Cambiado a blanco */
+            font-weight: bold;
+        }
+
+        .divider {
+            border-top: 1px dashed #444;
+            margin: 15px 0;
+        }
+
+        .btn-checkout {
+            background: linear-gradient(45deg, #0d6efd, #00c3ff);
+            border: none;
+            padding: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            color: white !important; /* Asegurar que el texto del botón sea blanco */
+        }
+
+        .btn-checkout:hover {
+            box-shadow: 0 0 15px rgba(0, 195, 255, 0.7);
+            transform: translateY(-2px);
+        }
+
+        .continue-shopping {
+            color: #00c3ff;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .continue-shopping:hover {
+            color: #0d6efd;
+        }
+
+        .remove-item {
+            color: #dc3545;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .remove-item:hover {
+            color: #ff6b6b;
+        }
+
+        .total-row {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white; /* Cambiado a blanco */
+        }
+
+        @media (max-width: 767.98px) {
+            .product-image {
+                width: 60px;
+                height: 60px;
+            }
+
+            .quantity-control {
+                width: 80px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">JaKaStyle</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        Categorías
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="#">Gorras Planas</a></li>
+                        <li><a class="dropdown-item" href="#">Gorras Trucker</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Contáctanos</a>
+                </li>
+            </ul>
+            <div class="d-flex align-items-center">
+                <a href="/mi-cuenta" class="btn btn-cuenta me-3">
+                    <i class="fas fa-user me-1"></i> Cuenta
+                </a>
+                <a href="#" class="nav-link cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-2">Carrito de Compras</h1>
+        </div>
+    </div>
+
+    <div class="empty-cart" th:if="${#lists.isEmpty(carrito.items)}">
+        <i class="fas fa-shopping-cart"></i>
+        <h2 style="color: white;">Tu carrito está vacío</h2>
+        <p class="mb-4" style="color: white;">Parece que aún no has añadido productos a tu carrito.</p>
+        <a href="#" class="btn btn-neon">Explorar productos</a>
+    </div>
+
+    <div class="row" th:unless="${#lists.isEmpty(carrito.items)}">
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-6">Producto</div>
+                        <div class="col-6 col-md-2 text-center">Cantidad</div>
+                        <div class="col-6 col-md-2 text-center">Precio</div>
+                        <div class="col-6 col-md-2 text-center">Subtotal</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div th:each="item : ${carrito.items}" class="row item-row align-items-center">
+                        <div class="col-md-6 d-flex align-items-center">
+                            <img th:src="@{/uploads/{nombreImagen}(nombreImagen=${item.producto.imagen})}"
+                                 class="product-image me-3">
+                            <div>
+                                <h5 th:text="${item.producto.nombre}"></h5>
+                                <button class="remove-item" th:data-item-id="${item.id}">Eliminar</button>
+                            </div>s
+                        </div>
+                        <div class="col-6 col-md-2 text-center">
+                            <span th:text="${item.cantidad}"></span>
+                        </div>
+                        <div class="col-6 col-md-2 text-center"
+                             th:text="${'$' + #numbers.formatDecimal(item.producto.precio, 1, 'COMMA', 2, 'POINT')}">
+                        </div>
+                        <div class="col-6 col-md-2 text-center"
+                             th:text="${'$' + #numbers.formatDecimal(item.subtotal, 1, 'COMMA', 2, 'POINT')}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <div class="col-lg-4">
+            <div class="card summary-card">
+                <div class="card-header" style="color: white;">
+                    Resumen del pedido
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span style="color: white;">Subtotal</span>
+                        <span class="price"
+                              th:text="${'$' + #aggregates.sum(carrito.items.![cantidad * producto.precio])}">$89.97</span>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="d-flex justify-content-between total-row mb-4">
+                        <span style="color: white;">Total</span>
+                        <span th:text="${'$' + (carrito.items != null ? #aggregates.sum(carrito.items.![subtotal]) : 0)}"></span>
+                    </div>
+
+                    <form th:action="@{/crear}" method="post">
+                        <div class="mb-3">
+                            <label for="direccionEnvio" class="form-label" style="color: white;">Dirección de envío</label>
+                            <input type="text" class="form-control" id="direccionEnvio" name="direccionEnvio" required>
+                        </div>
+
+                        <!-- ... resto del resumen ... -->
+
+                        <button type="submit" class="btn btn-primary w-100 btn-checkout">
+                            Proceder al pago <i class="fas fa-lock ms-2"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Controladores para los botones de cantidad
+        const increaseButtons = document.querySelectorAll('.increase-qty');
+        const decreaseButtons = document.querySelectorAll('.decrease-qty');
+        const removeButtons = document.querySelectorAll('.remove-item');
+
+        increaseButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const itemId = this.getAttribute('data-item-id');
+                updateQuantity(itemId, 1);
+            });
+        });
+
+        decreaseButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const itemId = this.getAttribute('data-item-id');
+                updateQuantity(itemId, -1);
+            });
+        });
+
+        removeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const itemId = this.getAttribute('data-item-id');
+                removeItem(itemId);
+            });
+        });
+
+        function updateQuantity(itemId, change) {
+            // Implementa la lógica para actualizar la cantidad
+            // Esta es una simulación básica, en un entorno real harías una petición AJAX al servidor
+            fetch(`/carrito/actualizar/${itemId}?cambio=${change}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]')?.getAttribute('content')
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload(); // Recarga la página para ver los cambios
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al actualizar el carrito:', error);
+                });
+        }
+
+        function removeItem(itemId) {
+            // Implementa la lógica para eliminar un ítem
+            fetch(`/carrito/eliminar/${itemId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]')?.getAttribute('content')
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload(); // Recarga la página para ver los cambios
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al eliminar el ítem:', error);
+                });
+        }
+    });
+</script>
+</body>
+</html>

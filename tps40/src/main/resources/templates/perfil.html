@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil | JaKaStyle</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --dark-bg: #121212;
+            --dark-secondary: #1e1e1e;
+            --neon-blue: #00f7ff;
+            --neon-blue-glow: 0 0 10px #00f7ff, 0 0 20px #00f7ff;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .profile-card {
+            background-color: var(--dark-secondary);
+            border: 2px solid var(--neon-blue);
+            border-radius: 15px;
+            box-shadow: var(--neon-blue-glow);
+        }
+
+        .neon-text {
+            color: var(--neon-blue);
+            text-shadow: var(--neon-blue-glow);
+        }
+
+        .profile-icon {
+            font-size: 5rem;
+            color: var(--neon-blue);
+            filter: drop-shadow(0 0 5px var(--neon-blue));
+        }
+
+        .detail-label {
+            font-size: 1.1rem;
+            color: var(--neon-blue);
+        }
+
+        .detail-value {
+            font-size: 1.2rem;
+            padding-left: 1rem;
+            word-break: break-word;
+        }
+
+        .btn-neon {
+            background: transparent;
+            color: var(--neon-blue);
+            border: 2px solid var(--neon-blue);
+            transition: all 0.3s;
+            padding: 0.75rem 2rem;
+        }
+
+        .btn-neon:hover {
+            background: var(--neon-blue);
+            color: var(--dark-bg);
+            box-shadow: var(--neon-blue-glow);
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark-secondary fixed-top">
+    <div class="container">
+        <a class="navbar-brand neon-text" th:href="@{/}">JaKaStyle</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/productos/productos_usuarios}">Productos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Contacto</a>
+                </li>
+            </ul>
+            <div class="d-flex align-items-center">
+                <div class="me-3" sec:authorize="isAuthenticated()">
+                    <a th:href="@{/carrito}" class="btn btn-neon position-relative">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span th:if="${carritoCount}" class="position-absolute top-0 start-100 translate-middle badge bg-danger" th:text="${carritoCount}"></span>
+                    </a>
+                </div>
+                <div class="dropdown" sec:authorize="isAuthenticated()">
+                    <button class="btn btn-neon dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user me-2"></i><span sec:authentication="name"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end bg-dark-secondary">
+                        <li><a class="dropdown-item text-white" th:href="@{/usuarios/perfil}">Perfil</a></li>
+                        <li><a class="dropdown-item text-white" th:href="@{/carrito}">Carrito</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" th:href="@{/usuarios/logout}">Cerrar Sesión</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<main class="container mt-5 pt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-6">
+            <div class="profile-card p-4 p-lg-5 mt-4">
+                <div class="text-center mb-4">
+                    <i class="fas fa-user-circle profile-icon"></i>
+                    <h1 class="neon-text mt-3">Mi Perfil</h1>
+                </div>
+
+                <!-- Mensajes de éxito/error -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                    <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <div class="mb-4">
+                    <div class="row mb-3">
+                        <div class="col-sm-4 detail-label">Nombre:</div>
+                        <div class="col-sm-8 detail-value" th:text="${usuario.nombre}"></div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 detail-label">Apellido:</div>
+                        <div class="col-sm-8 detail-value" th:text="${usuario.apellido}"></div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 detail-label">Email:</div>
+                        <div class="col-sm-8 detail-value" th:text="${usuario.email}"></div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 detail-label">Usuario:</div>
+                        <div class="col-sm-8 detail-value" th:text="${usuario.nombreUsuario}"></div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 detail-label">Teléfono:</div>
+                        <div class="col-sm-8 detail-value" th:text="${usuario.contacto}"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 detail-label">Dirección:</div>
+                        <div class="col-sm-8 detail-value" th:text="${usuario.direccion}"></div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <a th:href="@{/usuarios/editar}" class="btn btn-neon me-3">
+                        <i class="fas fa-edit me-2"></i>Editar Perfil
+                    </a>
+                    <a th:href="@{/usuarios/logout}" class="btn btn-neon">
+                        <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
