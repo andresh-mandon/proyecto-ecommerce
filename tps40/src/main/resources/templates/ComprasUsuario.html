@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Gorras</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1e1e1e; /* Fondo oscuro para toda la página */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .barra-navegacion {
+            background-color: #333;
+            color: white;
+            width: 100%;
+            padding: 15px 0;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .barra-navegacion ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .barra-navegacion li {
+            margin: 0 15px;
+        }
+
+        .barra-navegacion a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .barra-navegacion a:hover {
+            color: #007bff;
+        }
+
+        .catalogo-container {
+            background-color: #2c2c2c; /* Fondo oscuro para el contenedor principal */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Ajusté la sombra para que se note en el fondo oscuro */
+            width: 95%;
+            max-width: 1400px;
+            display: flex;
+        }
+
+        .sidebar-filtros {
+            width: 250px;
+            margin-right: 20px;
+            padding: 15px;
+            border: 1px solid #444; /* Borde más oscuro */
+            border-radius: 8px;
+            background-color: #3a3a3a; /* Fondo oscuro para la barra lateral */
+            color: #eee; /* Texto más claro para la barra lateral */
+        }
+
+        .sidebar-filtros h3 {
+            color: #eee;
+        }
+
+        .filtro-grupo {
+            margin-bottom: 20px;
+        }
+
+        .filtro-titulo {
+            font-weight: bold;
+            color: #ddd;
+            margin-bottom: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .filtro-titulo::after {
+            content: '+';
+            font-size: 1.2em;
+            color: #ddd;
+        }
+
+        .filtro-titulo.activo::after {
+            content: '-';
+        }
+
+        .filtro-opciones {
+            display: none;
+            padding-left: 15px;
+        }
+
+        .filtro-titulo.activo + .filtro-opciones {
+            display: block;
+        }
+
+        .filtro-opcion {
+            margin-bottom: 8px;
+            color: #eee;
+        }
+
+        .filtro-opcion label {
+            display: block;
+            cursor: pointer;
+        }
+
+        .filtro-precio-inputs {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filtro-precio-inputs label {
+            color: #eee;
+        }
+
+        .filtro-precio-inputs input[type="number"] {
+            width: 80px;
+            padding: 8px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            background-color: #444;
+            color: #eee;
+        }
+
+        .productos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            flex-grow: 1;
+        }
+
+        .producto-card {
+            border: 1px solid #444;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #3a3a3a;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: #eee; /* Texto claro para las tarjetas de producto */
+        }
+
+        .producto-imagen-container {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #2c2c2c; /* Fondo oscuro para las imágenes */
+        }
+
+        .producto-imagen {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .producto-info {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .producto-nombre {
+            font-weight: bold;
+            color: #ddd;
+            margin-bottom: 5px;
+        }
+
+        .producto-precio {
+            color: #007bff;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .producto-botones {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            background-color: #2c2c2c; /* Fondo oscuro para los botones */
+        }
+
+        .producto-botones button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .producto-botones button.carrito {
+            background-color: #0e0d0d;
+        }
+
+        .producto-botones button.comprar {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .producto-botones button:hover {
+            opacity: 0.9;
+        }
+
+        .barra-navegacion a {
+            color: #ddd; /* Texto más claro en la navegación */
+        }
+
+        .barra-navegacion a:hover {
+            color: #00bfff; /* Hover más brillante */
+        }
+
+
+
+        /* Estilos para la nueva barra superior */
+        .barra-superior {
+            background-color: #000; /* Fondo negro como en la imagen */
+            color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            box-sizing: border-box; /* Para que el padding no aumente el ancho total */
+        }
+
+        .barra-superior-izquierda {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+
+        .menu-superior ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+        }
+
+        .menu-superior li {
+            margin-right: 15px;
+        }
+
+        .menu-superior a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .menu-superior a:hover {
+            color: #ccc;
+        }
+
+        .barra-superior-derecha a {
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .barra-superior-derecha a i {
+            margin-right: 5px;
+        }
+
+        /* Ajustes para el body y la barra de navegación principal */
+        body {
+            /* ... otros estilos ... */
+            padding-top: 50px; /* Para dejar espacio debajo de la barra superior fija si lo deseas */
+            box-sizing: border-box; /* Asegura que el padding del body no afecte el layout general */
+        }
+
+        .barra-navegacion {
+            /* ... tus estilos existentes ... */
+            margin-top: 20px; /* Ajusta el margen superior para separarlo de la barra superior */
+        }
+    </style>
+
+
+    </head>
+    <body>
+    <div class="barra-superior">
+        <div class="barra-superior-izquierda">
+            <span class="logo">JakaStyle</span>
+            <nav class="menu-superior">
+                <ul>
+                    <li><a href="#">Categorías</a></li>
+                    <li><a href="#">Contáctanos</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="barra-superior-derecha">
+            <a href="#" class="cuenta"><i class="fas fa-user"></i> Cuenta</a>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    
+    <div class="barra-navegacion">
+        <ul>
+            <li><a href="#" data-categoria="todas">Todas las Gorras</a></li>
+            <li><a href="#" data-categoria="planas">Gorras Planas</a></li>
+            <li><a href="#" data-categoria="trucker">Gorras Trucker</a></li>
+        </ul>
+    </div>
+
+    <div class="catalogo-container">
+        <div class="sidebar-filtros">
+            <h3>Filtrar por:</h3>
+
+            <div class="filtro-grupo">
+                <div class="filtro-titulo" onclick="toggleOpciones(this)">Marca</div>
+                <div class="filtro-opciones">
+                    <div class="filtro-opcion">
+                        <label><input type="checkbox" name="marca" value="new-era"> New Era</label>
+                    </div>
+                    <div class="filtro-opcion">
+                        <label><input type="checkbox" name="marca" value="nike"> Nike</label>
+                    </div>
+                    <div class="filtro-opcion">
+                        <label><input type="checkbox" name="marca" value="adidas"> Adidas</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filtro-grupo">
+                <div class="filtro-titulo activo" onclick="toggleOpciones(this)">Color</div>
+                <div class="filtro-opciones" style="display: block;">
+                    <div class="filtro-opcion">
+                        <label><input type="checkbox" name="color" value="negro"> Negro</label>
+                    </div>
+                    <div class="filtro-opcion">
+                        <label><input type="checkbox" name="color" value="azul"> Azul</label>
+                    </div>
+                    <div class="filtro-opcion">
+                        <label><input type="checkbox" name="color" value="rojo"> Rojo</label>
+                    </div>
+                    <div class="filtro-opcion">
+                        <label><input type="checkbox" name="color" value="blanco"> Blanco</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filtro-grupo">
+                <div class="filtro-titulo" onclick="toggleOpciones(this)">Talla</div>
+                <div class="filtro-opciones">
+                    <div class="filtro-opcion">
+                        <label><input type="checkbox" name="talla" value="unica"> Unitalla</label>
+                    </div>
+                    <div class="filtro-opcion">
+                        <label><input type="checkbox" name="talla" value="s"> S</label>
+                    </div>
+                    <div class="filtro-opcion">
+                        <label><input type="checkbox" name="talla" value="m"> M</label>
+                    </div>
+                    <div class="filtro-opcion">
+                        <label><input type="checkbox" name="talla" value="l"> L</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filtro-grupo">
+                <div class="filtro-titulo activo" onclick="toggleOpciones(this)">Precio</div>
+                <div class="filtro-opciones" style="display: block;">
+                    <div class="filtro-precio-inputs">
+                        <label for="precio-min">Min:</label>
+                        <input type="number" id="precio-min" placeholder="Mínimo">
+                    </div>
+                    <div class="filtro-precio-inputs">
+                        <label for="precio-max">Max:</label>
+                        <input type="number" id="precio-max" placeholder="Máximo">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="productos-grid">
+            <div class="producto-card" data-categoria="planas" data-marca="new-era" data-color="negro" data-talla="unica" data-precio="29990">
+                <div class="producto-imagen-container">
+                    <img src="img/Gorra%20Plana%20Negra%20New%20Era.png" alt="Gorra Plana Negra New Era" class="producto-imagen">
+                </div>
+                <div class="producto-info">
+                    <h3 class="producto-nombre">Gorra Plana Negra New Era</h3>
+                    <p class="producto-precio">$29.990</p>
+                    <div class="producto-botones">
+                        <button class="carrito">Añadir al Carrito</button>
+                        <button class="comprar">Comprar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="producto-card" data-categoria="planas" data-marca="new-era" data-color="blanca" data-talla="unica" data-precio="29990">
+                <div class="producto-imagen-container">
+                    <img src="img/Gorra%20Plana%20Blanca%20New%20Era.png" alt="Gorra Plana Blanca New Era" class="producto-imagen">
+                </div>
+                <div class="producto-info">
+                    <h3 class="producto-nombre">Gorra Plana Blanca New </h3>
+                    <p class="producto-precio">$29.990</p>
+                    <div class="producto-botones">
+                        <button class="carrito">Añadir al Carrito</button>
+                        <button class="comprar">Comprar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="producto-card" data-categoria="planas" data-marca="new-era" data-color="Azul" data-talla="unica" data-precio="39990">
+                <div class="producto-imagen-container">
+                    <img src="img/Gorra%20Plana%20Azul%20New%20Era.png" alt="Gorra Plana Azul New Era" class="producto-imagen">
+                </div>
+                <div class="producto-info">
+                    <h3 class="producto-nombre">Gorra Plana Azul Nike</h3>
+                    <p class="producto-precio">$39.990</p>
+                    <div class="producto-botones">
+                        <button class="carrito">Añadir al Carrito</button>
+                        <button class="comprar">Comprar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="producto-card" data-categoria="planas" data-marca="new-era" data-color="gris" data-talla="unica" data-precio="27990">
+                <div class="producto-imagen-container">
+                    <img src="https://via.placeholder.com/300/808080/FFF?Text=Gorra+Ajustable+Gris+New+Era" alt="Gorra Ajustable Gris New Era" class="producto-imagen">
+                </div>
+                <div class="producto-info">
+                    <h3 class="producto-nombre">Gorra Ajustable Gris New Era</h3>
+                    <p class="producto-precio">$27.990</p>
+                    <div class="producto-botones">
+                        <button class="carrito">Añadir al Carrito</button>
+                        <button class="comprar">Comprar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="producto-card" data-categoria="trucker" data-marca="nike" data-color="negro" data-talla="m" data-precio="24000">
+                <div class="producto-imagen-container">
+                    <img src="https://via.placeholder.com/300/000/FFF?Text=Gorra+Trucker+Negra+Nike" alt="Gorra Trucker Negra Nike" class="producto-imagen">
+                </div>
+                <div class="producto-info">
+                    <h3 class="producto-nombre">Gorra Trucker Negra Nike</h3>
+                    <p class="producto-precio">$24.000</p>
+                    <div class="producto-botones">
+                        <button class="carrito">Añadir al Carrito</button>
+                        <button class="comprar">Comprar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="producto-card" data-categoria="trucker" data-marca="nike" data-color="roja" data-talla="m" data-precio="25000">
+                <div class="producto-imagen-container">
+                    <img src="https://via.placeholder.com/300/000/FFF?Text=Gorra+Trucker+Negra+Nike" alt="Gorra Trucker Negra Nike" class="producto-imagen">
+                </div>
+                <div class="producto-info">
+                    <h3 class="producto-nombre">Gorra Trucker Roja Nike</h3>
+                    <p class="producto-precio">$25.000</p>
+                    <div class="producto-botones">
+                        <button class="carrito">Añadir al Carrito</button>
+                        <button class="comprar">Comprar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="producto-card" data-categoria="trucker" data-marca="nike" data-color="Blanca" data-talla="L" data-precio="30000">
+                <div class="producto-imagen-container">
+                    <img src="https://via.placeholder.com/300/000/FFF?Text=Gorra+Trucker+Negra+Nike" alt="Gorra Trucker Negra Nike" class="producto-imagen">
+                </div>
+                <div class="producto-info">
+                    <h3 class="producto-nombre">Gorra Trucker Blanca Nike</h3>
+                    <p class="producto-precio">$30.000</p>
+                    <div class="producto-botones">
+                        <button class="carrito">Añadir al Carrito</button>
+                        <button class="comprar">Comprar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="producto-card" data-categoria="planas" data-marca="nike" data-color="gris" data-talla="s" data-precio="25500">
+                <div class="producto-imagen-container">
+                    <img src="https://via.placeholder.com/300/808080/FFF?Text=Gorra+Plana+Gris+Nike" alt="Gorra Plana Gris Nike" class="producto-imagen">
+                </div>
+                <div class="producto-info">
+                    <h3 class="producto-nombre">Gorra Plana Gris Nike</h3>
+                    <p class="producto-precio">$25.500</p>
+                    <div class="producto-botones">
+                        <button class="carrito">Añadir al Carrito</button>
+                        <button class="comprar">Comprar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="producto-card" data-categoria="trucker" data-marca="Nike" data-color="Naranja" data-talla="m" data-precio="25000">
+                <div class="producto-imagen-container">
+                    <img src="https://via.placeholder.com/300/000/FFF?Text=Gorra+Trucker+Negra+Nike" alt="Gorra Trucker Negra Nike" class="producto-imagen">
+                </div>
+                <div class="producto-info">
+                    <h3 class="producto-nombre">Gorra Trucker Naranja Nike</h3>
+                    <p class="producto-precio">$25.000</p>
+                    <div class="producto-botones">
+                        <button class="carrito">Añadir al Carrito</button>
+                        <button class="comprar">Comprar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="producto-card" data-categoria="planas" data-marca="nike" data-color="Rosada" data-talla="M" data-precio="25500">
+                <div class="producto-imagen-container">
+                    <img src="https://via.placeholder.com/300/808080/FFF?Text=Gorra+Plana+Gris+Nike" alt="Gorra Plana Gris Nike" class="producto-imagen">
+                </div>
+                <div class="producto-info">
+                    <h3 class="producto-nombre">Gorra Plana Rosada Nike</h3>
+                    <p class="producto-precio">$25.500</p>
+                    <div class="producto-botones">
+                        <button class="carrito">Añadir al Carrito</button>
+                        <button class="comprar">Comprar</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function toggleOpciones(titulo) {
+            titulo.classList.toggle('activo');
+        }
+
+        const productosGrid = document.querySelector('.productos-grid');
+        const productos = Array.from(productosGrid.querySelectorAll('.producto-card'));
+        const categoriaLinks = document.querySelectorAll('.barra-navegacion a');
+        const marcaCheckboxes = document.querySelectorAll('input[name="marca"]');
+        const colorCheckboxes = document.querySelectorAll('input[name="color"]');
+        const tallaCheckboxes = document.querySelectorAll('input[name="talla"]');
+        const precioMinInput = document.getElementById('precio-min');
+        const precioMaxInput = document.getElementById('precio-max');
+
+        function filtrarProductos() {
+            const categoriaActiva = document.querySelector('.barra-navegacion a.activa')?.dataset.categoria || 'todas';
+            const marcasSeleccionadas = Array.from(marcaCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+            const coloresSeleccionados = Array.from(colorCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+            const tallasSeleccionadas = Array.from(tallaCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+            const precioMin = parseFloat(precioMinInput.value) || 0;
+            const precioMax = parseFloat(precioMaxInput.value) || Infinity;
+
+            productos.forEach(producto => {
+                const categoriaProducto = producto.dataset.categoria;
+                const marcaProducto = producto.dataset.marca;
+                const colorProducto = producto.dataset.color;
+                const tallaProducto = producto.dataset.talla;
+                const precioProducto = parseFloat(producto.dataset.precio);
+
+                const filtroCategoria = categoriaActiva === 'todas' || categoriaProducto === categoriaActiva;
+                const filtroMarca = marcasSeleccionadas.length === 0 || marcasSeleccionadas.includes(marcaProducto);
+                const filtroColor = coloresSeleccionados.length === 0 || coloresSeleccionadas.includes(colorProducto);
+                const filtroTalla = tallasSeleccionadas.length === 0 || tallasSeleccionadas.includes(tallaProducto);
+                const filtroPrecio = precioProducto >= precioMin && precioProducto <= precioMax;
+
+                if (filtroCategoria && filtroMarca && filtroColor && filtroTalla && filtroPrecio) {
+                    producto.style.display = 'block';
+                } else {
+                    producto.style.display = 'none';
+                }
+            });
+        }
+
+        categoriaLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                event.preventDefault();
+                categoriaLinks.forEach(l => l.classList.remove('activa'));
+                this.classList.add('activa');
+                filtrarProductos();
+            });
+        });
+
+        marcaCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', filtrarProductos);
+        });
+
+        colorCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', filtrarProductos);
+        });
+
+        tallaCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', filtrarProductos);
+        });
+
+        precioMinInput.addEventListener('change', filtrarProductos);
+        precioMaxInput.addEventListener('change', filtrarProductos);
+
+        // Mostrar todas las gorras al cargar la página inicialmente
+        filtrarProductos();
+    </script>
+    </body>
+    </html>

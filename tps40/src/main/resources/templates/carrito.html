@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>Carrito de Compras - JakaStyle</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-bg: #f8f9fa;
+            --text-color: #333333;
+            --white: #ffffff;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 1.8rem;
+        }
+
+        .nav-link {
+            color: var(--primary-color);
+            margin: 0 10px;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--secondary-color);
+            transition: width 0.3s;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-link:hover {
+            color: var(--secondary-color);
+        }
+
+        .btn-primary-custom {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            border: none;
+            transition: all 0.3s;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 500;
+        }
+
+        .btn-primary-custom:hover {
+            background-color: var(--primary-color);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-outline-custom {
+            background-color: transparent;
+            color: var(--secondary-color);
+            border: 2px solid var(--secondary-color);
+            transition: all 0.3s;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 500;
+        }
+
+        .btn-outline-custom:hover {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Card Styles */
+        .card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            background-color: var(--light-bg);
+            border-bottom: 1px solid var(--border-color);
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s;
+        }
+
+        .product-image:hover {
+            transform: scale(1.05);
+        }
+
+        .item-row {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            align-items: center;
+        }
+
+        .item-row:last-child {
+            border-bottom: none;
+        }
+
+        .quantity-control {
+            width: 100px;
+            background-color: var(--light-bg);
+            border-radius: 25px;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .quantity-btn {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--secondary-color);
+            color: var(--white);
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 0.8rem;
+        }
+
+        .quantity-btn:hover {
+            background-color: var(--primary-color);
+        }
+
+        .quantity-display {
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-cart i {
+            font-size: 5rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+
+        .summary-card {
+            position: sticky;
+            top: 20px;
+        }
+
+        .price {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .divider {
+            border-top: 1px dashed var(--border-color);
+            margin: 15px 0;
+        }
+
+        .btn-checkout {
+            background-color: var(--secondary-color);
+            border: none;
+            padding: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            color: var(--white) !important;
+        }
+
+        .btn-checkout:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .continue-shopping {
+            color: var(--secondary-color);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: color 0.3s;
+        }
+
+        .continue-shopping:hover {
+            color: var(--primary-color);
+        }
+
+        .remove-item {
+            color: var(--accent-color);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .remove-item:hover {
+            color: #ff6b6b;
+        }
+
+        .total-row {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 40px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 3px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--secondary-color);
+        }
+
+        @media (max-width: 767.98px) {
+            .product-image {
+                width: 60px;
+                height: 60px;
+            }
+
+            .quantity-control {
+                width: 80px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light sticky-top">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">JaKaStyle</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a th:href="@{/productos/productos_usuarios}" class="nav-link"><i class="fas fa-hat-cowboy me-1"></i> Productos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Contáctanos</a>
+                </li>
+            </ul>
+            <div class="d-flex align-items-center">
+                <!-- Icono del carrito -->
+                <div sec:authorize="isAuthenticated()" class="me-3">
+                    <a th:href="@{/carrito}" class="btn btn-outline-custom position-relative">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span th:if="${carritoCount}" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" th:text="${carritoCount}"></span>
+                    </a>
+                </div>
+                <div sec:authorize="isAuthenticated()">
+                    <div class="dropdown">
+                        <button class="btn btn-primary-custom dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user me-1"></i> Mi Cuenta
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <li><a class="dropdown-item" th:href="@{/usuarios/perfil}">Perfil</a></li>
+                            <li><a class="dropdown-item" th:href="@{/carrito}">Carrito</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" th:href="@{/usuarios/logout}">Cerrar Sesión</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div sec:authorize="isAnonymous()">
+                    <a th:href="@{/usuarios/login}" class="btn btn-primary-custom me-3">
+                        <i class="fas fa-user me-1"></i> Cuenta
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="section-title">Carrito de Compras</h1>
+        </div>
+    </div>
+
+    <div class="empty-cart" th:if="${#lists.isEmpty(carrito.items)}">
+        <i class="fas fa-shopping-cart"></i>
+        <h2>Tu carrito está vacío</h2>
+        <p class="mb-4">Parece que aún no has añadido productos a tu carrito.</p>
+        <a href="/productos/productos_usuarios" class="btn btn-primary-custom">Explorar productos</a>
+    </div>
+
+    <div class="row" th:unless="${#lists.isEmpty(carrito.items)}">
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-6">Producto</div>
+                        <div class="col-6 col-md-2 text-center">Cantidad</div>
+                        <div class="col-6 col-md-2 text-center">Precio</div>
+                        <div class="col-6 col-md-2 text-center">Subtotal</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div th:each="item : ${carrito.items}" class="row item-row align-items-center">
+                        <div class="col-md-6 d-flex align-items-center">
+                            <img th:src="@{'/uploads/' + ${item.producto.imagen}}" 
+                                 class="product-image me-3" 
+                                 th:alt="${item.producto.nombre}"
+                                 onerror="this.src='https://via.placeholder.com/80x80?text=Imagen+no+disponible'">
+                            <div>
+                                <h5 class="mb-1" th:text="${item.producto.nombre}"></h5>
+                                <button class="btn btn-sm remove-item" th:data-item-id="${item.id}">
+                                    <i class="fas fa-trash-alt me-1"></i> Eliminar
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-2 text-center">
+                            <div class="quantity-control mx-auto">
+                                <button class="quantity-btn decrease-qty" th:data-item-id="${item.id}">-</button>
+                                <span class="quantity-display" th:text="${item.cantidad}" data-item-id="${item.id}"></span>
+                                <button class="quantity-btn increase-qty" th:data-item-id="${item.id}">+</button>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-2 text-center price" th:text="${'$' + item.producto.precio}"></div>
+                        <div class="col-6 col-md-2 text-center price" th:text="${'$' + item.subtotal}"></div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="/productos/productos_usuarios" class="continue-shopping">
+                        <i class="fas fa-arrow-left me-2"></i> Continuar comprando
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card summary-card">
+                <div class="card-header">
+                    Resumen del pedido
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal</span>
+                        <span class="price" th:text="${'$' + carrito.total}"></span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Envío</span>
+                        <span class="price">$5.00</span>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="d-flex justify-content-between total-row mb-4">
+                        <span>Total</span>
+                        <span class="price" th:text="${'$' + (carrito.total + 5)}"></span>
+                    </div>
+
+                    <button class="btn btn-checkout w-100">
+                        Proceder al pago <i class="fas fa-lock ms-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // ... (código para botones de cantidad y eliminar item - sin cambios) ...
+        const increaseButtons = document.querySelectorAll('.increase-qty');
+        const decreaseButtons = document.querySelectorAll('.decrease-qty');
+        const removeButtons = document.querySelectorAll('.remove-item');
+        const checkoutButton = document.querySelector('.btn-checkout');
+
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        increaseButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const itemId = this.closest('.item-row').querySelector('.remove-item').getAttribute('data-item-id'); // Mejor forma de obtener ID
+                const quantityDisplay = this.parentElement.querySelector('.quantity-display');
+                updateItemQuantity(itemId, parseInt(quantityDisplay.textContent) + 1);
+            });
+        });
+
+        decreaseButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const itemId = this.closest('.item-row').querySelector('.remove-item').getAttribute('data-item-id'); // Mejor forma de obtener ID
+                const quantityDisplay = this.parentElement.querySelector('.quantity-display');
+                const currentQty = parseInt(quantityDisplay.textContent);
+                if (currentQty > 1) {
+                    updateItemQuantity(itemId, currentQty - 1);
+                } else {
+                    // Opcional: Confirmar antes de eliminar al bajar de 1
+                    if (confirm('¿Quieres eliminar este producto del carrito?')) {
+                         removeCartItem(itemId);
+                    }
+                }
+            });
+        });
+
+        removeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const itemId = this.getAttribute('data-item-id');
+                if (confirm('¿Estás seguro de que quieres eliminar este producto del carrito?')) {
+                    removeCartItem(itemId);
+                }
+            });
+        });
+
+        if (checkoutButton) {
+            checkoutButton.addEventListener('click', function() {
+                 // Deshabilitar botón para evitar doble click
+                 this.disabled = true;
+                 this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...';
+                 procesarPago();
+            });
+        }
+
+        function updateItemQuantity(itemId, cantidad) {
+            // Deshabilitar botones temporalmente mientras se actualiza
+            document.querySelectorAll(`.quantity-btn[data-item-id="${itemId}"]`).forEach(b => b.disabled = true);
+
+            fetch(`/carrito/item/${itemId}/actualizar`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    [csrfHeader]: csrfToken
+                },
+                body: `cantidad=${cantidad}`
+            })
+            .then(response => {
+                if (response.ok) {
+                    location.reload(); // Recarga para ver cambios
+                } else {
+                   return response.json().then(err => { throw new Error(err.message || 'Error desconocido al actualizar cantidad'); });
+                }
+            })
+            .catch(error => {
+                console.error('Error al actualizar cantidad:', error);
+                alert('Error al actualizar cantidad: ' + error.message);
+                 // Volver a habilitar botones en caso de error
+                 document.querySelectorAll(`.quantity-btn[data-item-id="${itemId}"]`).forEach(b => b.disabled = false);
+                 // Recargar para estado consistente
+                 location.reload();
+            });
+        }
+
+        function removeCartItem(itemId) {
+             // Deshabilitar botón de eliminar temporalmente
+             const removeButton = document.querySelector(`.remove-item[data-item-id="${itemId}"]`);
+             if(removeButton) removeButton.disabled = true;
+
+            fetch(`/carrito/item/${itemId}/eliminar`, {
+                method: 'POST',
+                headers: {
+                    [csrfHeader]: csrfToken
+                    // No se necesita Content-Type si no hay body
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    location.reload(); // Recarga para ver cambios
+                } else {
+                    return response.json().then(err => { throw new Error(err.message || 'Error desconocido al eliminar item'); });
+                }
+            })
+            .catch(error => {
+                console.error('Error al eliminar ítem:', error);
+                alert('Error al eliminar el producto: ' + error.message);
+                 // Volver a habilitar botón en caso de error
+                 if(removeButton) removeButton.disabled = false;
+                 // Recargar para estado consistente
+                 location.reload();
+            });
+        }
+
+        function procesarPago() {
+            // El botón ya está deshabilitado y con spinner
+            fetch('/ordenes/crear', {
+                method: 'POST',
+                headers: {
+                    // No se necesita Content-Type si no envías JSON en el body
+                    [csrfHeader]: csrfToken
+                }
+                // No hay body que enviar para esta solicitud específica
+            })
+            .then(response => {
+                 // Siempre intentar parsear JSON, incluso para errores, porque el controller lo devuelve
+                return response.json().then(data => {
+                    if (!response.ok) {
+                         // Si la respuesta no es OK (ej. 4xx, 5xx), lanzar error con mensaje del servidor
+                         throw new Error(data.message || `Error ${response.status}: ${response.statusText}`);
+                    }
+                    return data; // Devolver data si la respuesta es OK
+                });
+            })
+            .then(data => {
+                 // Aquí 'data' es el JSON de respuesta exitosa ({success: true, message: ..., ordenId: ...})
+                console.log('Respuesta de /ordenes/crear:', data);
+                alert('¡Orden creada exitosamente! Número de orden: ' + data.ordenId);
+                // Redirigir a la página de "mis órdenes"
+                window.location.href = '/ordenes/mis-ordenes';
+            })
+            .catch(error => {
+                 // Captura errores de red o los errores lanzados desde el .then anterior
+                console.error('Error al procesar el pago:', error);
+                // Mostrar el mensaje de error específico del servidor o un mensaje genérico
+                alert('Error al procesar el pago: ' + error.message);
+                
+                // Volver a habilitar el botón de checkout y restaurar su texto
+                const btn = document.querySelector('.btn-checkout');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Proceder al pago <i class="fas fa-lock ms-2"></i>';
+                }
+            });
+            // No necesitas el 'if (confirm...)' aquí, ya que el botón es la confirmación.
+            // Si quieres una confirmación extra, ponla *antes* del fetch.
+        }
+    });
+</script>
+</body>
+</html>

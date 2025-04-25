@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JaKaStyle - Dashboard Administrativo</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+          --primary-color: #2c3e50;
+          --secondary-color: #34495e;
+          --accent-color: #3498db;
+          --light-color: #ecf0f1;
+          --dark-color: #2c3e50;
+        }
+        
+        body {
+          background-color: #f8f9fa;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .sidebar {
+          min-height: calc(100vh - 56px);
+          background-color: var(--primary-color);
+          color: white;
+          box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar .nav-link {
+          color: rgba(255, 255, 255, 0.8);
+          padding: 12px 20px;
+          margin: 2px 0;
+          border-radius: 4px;
+          transition: all 0.3s;
+        }
+        
+        .sidebar .nav-link:hover {
+          color: #fff;
+          background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar .nav-link.active {
+          color: #fff;
+          background-color: var(--accent-color);
+        }
+        
+        .sidebar .nav-link i {
+          margin-right: 10px;
+          width: 20px;
+          text-align: center;
+        }
+        
+        .content {
+          padding: 25px;
+          background-color: #fff;
+          border-radius: 8px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .card {
+          border: none;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+          margin-bottom: 20px;
+          border-radius: 8px;
+          overflow: hidden;
+        }
+        
+        .card-header {
+          background-color: var(--primary-color);
+          color: white;
+          font-weight: 500;
+          padding: 12px 15px;
+        }
+        
+        .table-responsive {
+          border-radius: 8px;
+          overflow: hidden;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .table thead {
+          background-color: var(--secondary-color);
+          color: white;
+        }
+        
+        .table th {
+          font-weight: 500;
+          padding: 12px 15px;
+        }
+        
+        .table td {
+          padding: 12px 15px;
+          vertical-align: middle;
+        }
+        
+        .stat-card {
+          border-radius: 8px;
+          padding: 20px;
+          background-color: white;
+          transition: all 0.3s;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .stat-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card .icon {
+          background-color: rgba(52, 152, 219, 0.1);
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.5rem;
+          margin-bottom: 15px;
+        }
+        
+        .stat-card.blue .icon {
+          color: #3498db;
+          background-color: rgba(52, 152, 219, 0.1);
+        }
+        
+        .stat-card.green .icon {
+          color: #2ecc71;
+          background-color: rgba(46, 204, 113, 0.1);
+        }
+        
+        .stat-card.yellow .icon {
+          color: #f1c40f;
+          background-color: rgba(241, 196, 15, 0.1);
+        }
+        
+        .stat-card.red .icon {
+          color: #e74c3c;
+          background-color: rgba(231, 76, 60, 0.1);
+        }
+        
+        .stat-card h3 {
+          font-size: 1.8rem;
+          margin-bottom: 5px;
+          font-weight: 600;
+        }
+        
+        .stat-card h5 {
+          color: #7f8c8d;
+          font-size: 1rem;
+          margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--dark-color);">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="#">
+      <i class="fas fa-hat-cowboy me-2"></i>JaKaStyle
+    </a>
+    <div class="d-flex align-items-center">
+      <div class="dropdown">
+        <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button"
+           data-bs-toggle="dropdown">
+          <i class="fas fa-user-circle me-1"></i>
+          <span th:text="${#authentication?.name} ?: 'admin@ejemplo1.com'">Usuario</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" href="#"><i class="fas fa-user-cog me-2"></i> Perfil</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <form th:action="@{/usuarios/logout}" method="post" class="dropdown-item p-0">
+              <button type="submit" class="btn btn-link text-decoration-none w-100 text-start px-3 py-2">
+                  <i class="fas fa-sign-out-alt me-2"></i> Cerrar sesión
+              </button>
+              <input type="hidden" th:name="${_csrf?.parameterName}" th:value="${_csrf?.token}"/>
+            </form>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+      <div class="position-sticky pt-3">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link active" th:href="@{/admin/dashboard}">
+              <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/admin/productos}">
+              <i class="fas fa-hat-cowboy"></i> Gorras
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/admin/ordenes}">
+              <i class="fas fa-clipboard-list"></i> Órdenes
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/admin/usuarios}">
+              <i class="fas fa-users"></i> Usuarios
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0" style="color: var(--dark-color);">
+          <i class="fas fa-tachometer-alt me-2"></i>Dashboard Administrativo
+        </h2>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="row mb-4">
+        <div class="col-md-3">
+          <div class="stat-card blue">
+            <div class="icon">
+              <i class="fas fa-shopping-cart"></i>
+            </div>
+            <h3 th:text="${'$' + #numbers.formatDecimal(ventasHoy, 1, 2, 'POINT')}">$0.00</h3>
+            <h5>Ventas Hoy</h5>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card green">
+            <div class="icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <h3 th:text="${ordenesPendientes}">0</h3>
+            <h5>Órdenes Pendientes</h5>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card yellow">
+            <div class="icon">
+              <i class="fas fa-hat-cowboy"></i>
+            </div>
+            <h3 th:text="${totalProductos}">0</h3>
+            <h5>Total Productos</h5>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card red">
+            <div class="icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <h3 th:text="${totalUsuarios != null ? totalUsuarios : '0'}">0</h3>
+            <h5>Total Usuarios</h5>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content Row -->
+      <div class="row">
+        <!-- Gráfico de ventas mensuales -->
+        <div class="col-md-8">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">Ventas Mensuales</h5>
+            </div>
+            <div class="card-body">
+              <canvas id="ventasChart" width="400" height="250"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Últimas órdenes -->
+        <div class="col-md-4">
+          <div class="card" th:if="${hayOrdenes}">
+            <div class="card-header">
+              <h5 class="mb-0">Últimas Órdenes</h5>
+            </div>
+            <div class="card-body p-0">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Fecha</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="orden : ${ultimasOrdenes}">
+                    <td th:text="${orden.id}">1</td>
+                    <td th:text="${#temporals.format(orden.fechaCreacion, 'dd/MM/yyyy HH:mm')}">22/04/2025 14:30</td>
+                    <td th:text="${'$' + #numbers.formatDecimal(orden.total, 1, 2, 'POINT')}">100.00</td>
+                    <td>
+                      <span th:text="${orden.estado}" 
+                          th:class="${orden.estado == 'ENTREGADO'} ? 'badge bg-success' : 
+                                    (${orden.estado == 'PENDIENTE'} ? 'badge bg-warning' : 'badge bg-secondary')">
+                        PENDIENTE
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="alert alert-info" th:unless="${hayOrdenes}">
+            No hay órdenes registradas aún.
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Bootstrap JS y Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Script para el gráfico -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('ventasChart').getContext('2d');
+        const ventasMensuales = /*[[${ventasMensuales}]]*/ {
+            'Enero': 12500,
+            'Febrero': 15000,
+            'Marzo': 18000,  
+            'Abril': 16500,
+            'Mayo': 21000,
+            'Junio': 22000,
+            'Julio': 25000
+        };
+        
+        const meses = Object.keys(ventasMensuales);
+        const valores = Object.values(ventasMensuales);
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: meses,
+                datasets: [{
+                    label: 'Ventas Mensuales',
+                    data: valores,
+                    backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                    borderColor: '#3498db',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    pointBackgroundColor: '#3498db',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            drawBorder: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

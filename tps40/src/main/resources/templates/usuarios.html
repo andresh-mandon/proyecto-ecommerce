@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JaKaStyle - Administración de Usuarios</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    /* Estilos CSS (como los tienes actualmente) */
+    .sidebar {
+      min-height: calc(100vh - 56px);
+      background-color: #343a40;
+      color: white;
+    }
+
+    .sidebar .nav-link {
+      color: rgba(255, 255, 255, 0.75);
+      padding: 10px 20px;
+    }
+
+    .sidebar .nav-link:hover {
+      color: #fff;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar .nav-link.active {
+      color: #fff;
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .sidebar .nav-link i {
+      margin-right: 10px;
+    }
+
+    .content {
+      padding: 20px;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">JaKaStyle</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+             data-bs-toggle="dropdown">
+            <i class="fas fa-user"></i> <span th:text="${#authentication.name}">Usuario</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#"><i class="fas fa-user-cog"></i> Perfil</a></li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            <li>
+              <form th:action="@{/logout}" method="post" class="dropdown-item p-0">
+                <button type="submit" class="btn btn-link text-decoration-none px-3 py-1">
+                  <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                </button>
+              </form>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+      <div class="position-sticky pt-3">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" href="/admin">
+              <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/admin/productos">
+              <i class="fas fa-hat-cowboy"></i> Gorras
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/admin/ordenes">
+              <i class="fas fa-clipboard-list"></i> Órdenes
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="/admin/usuarios">
+              <i class="fas fa-users"></i> Usuarios
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 content">
+      <div
+              class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Administración de Usuarios</h1>
+        <a href="/admin/usuarios/nuevo" class="btn btn-primary">
+          <i class="fas fa-user-plus"></i> Agregar Usuario
+        </a>
+      </div>
+
+      <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i> <span th:text="${success}">Operación exitosa</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i> <span th:text="${error}">Error en la operación</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Buscar usuarios..." id="searchUserInput">
+            <button class="btn btn-outline-secondary" type="button">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <select class="form-select" id="rolFilter">
+            <option value="">Todos los roles</option>
+            <option value="USUARIO">Usuario</option>
+            <option value="ADMIN">Administrador</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+          <thead class="table-dark">
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Email</th>
+            <th>Nombre de Usuario</th>
+            <th>Contacto</th>
+            <th>Dirección</th>
+            <th>Rol</th>
+            <th>Acciones</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="usuario : ${usuarios}">
+            <td th:text="${usuario.id}">1</td>
+            <td th:text="${usuario.nombre}"></td>
+            <td th:text="${usuario.apellido}"></td>
+            <td th:text="${usuario.email}">admin@gorrapro.com</td>
+            <td th:text="${usuario.nombreUsuario}">admin</td>
+            <td th:text="${usuario.contacto}"></td>
+            <td th:text="${usuario.direccion}"></td>
+            <td>
+                            <span th:if="${usuario.rol == T(com.tps40.tps40.Entities.Usuarios.Rol).ADMIN}"
+                                  class="badge bg-danger">Administrador</span>
+              <span th:if="${usuario.rol == T(com.tps40.tps40.Entities.Usuarios.Rol).USUARIO}"
+                    class="badge bg-primary">Usuario</span>
+            </td>
+            <td>
+              <a th:href="@{'/admin/usuarios/editar/' + ${usuario.id}}" class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i>
+              </a>
+              <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                      th:data-bs-target="'#eliminarUsuarioModal' + ${usuario.id}">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <nav>
+        <ul class="pagination justify-content-center">
+          <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+          </li>
+          <li class="page-item active"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item">
+            <a class="page-link" href="#">Siguiente</a>
+          </li>
+        </ul>
+      </nav>
+    </main>
+  </div>
+</div>
+
+<div class="modal fade" id="eliminarUsuarioModal1" tabindex="-1" aria-labelledby="eliminarUsuarioModalLabel1"
+     aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="eliminarUsuarioModalLabel1">Confirmar Eliminación</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro de que deseas eliminar el usuario <strong th:text="${usuario.nombre}"></strong>?</p>
+        <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <form th:action="@{/admin/usuarios/eliminar/1}" method="post">
+          <input type="hidden" name="id" value="1">
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Filtrar usuarios por nombre o email
+  document.getElementById('searchUserInput').addEventListener('keyup', function () {
+    let filter = this.value.toLowerCase();
+    let table = document.querySelector('table');
+    let tr = table.getElementsByTagName('tr');
+
+    for (let i = 1; i < tr.length; i++) {
+      let tdNombre = tr[i].getElementsByTagName('td')[1];
+      let tdEmail = tr[i].getElementsByTagName('td')[3];
+
+      if (tdNombre && tdEmail) {
+        let txtNombre = tdNombre.textContent || tdNombre.innerText;
+        let txtEmail = tdEmail.textContent || tdEmail.innerText;
+
+        if (txtNombre.toLowerCase().indexOf(filter) > -1 || txtEmail.toLowerCase().indexOf(filter) > -1) {
+          tr[i].style.display = '';
+        } else {
+          tr[i].style.display = 'none';
+        }
+      }
+    }
+  });
+
+  // Filtrar por rol
+  document.getElementById('rolFilter').addEventListener('change', function () {
+    let filter = this.value.toLowerCase();
+    let table = document.querySelector('table');
+    let tr = table.getElementsByTagName('tr');
+
+    for (let i = 1; i < tr.length; i++) {
+      let tdRol = tr[i].getElementsByTagName('td')[7]; // Cambiado a índice 7
+
+      if (tdRol) {
+        let txtRol = tdRol.textContent || tdRol.innerText;
+
+        if (filter === '' || txtRol.toLowerCase().indexOf(filter.toLowerCase()) > -1) {
+          tr[i].style.display = '';
+        } else {
+          tr[i].style.display = 'none';
+        }
+      }
+    }
+  });
+</script>
+</body>
+
+</html>

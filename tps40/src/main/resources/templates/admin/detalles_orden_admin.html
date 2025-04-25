@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JaKaStyle - Detalle de Orden</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .sidebar {
+            min-height: calc(100vh - 56px);
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            margin: 2px 0;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        .sidebar .nav-link:hover {
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar .nav-link.active {
+            color: #fff;
+            background-color: var(--accent-color);
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .content {
+            padding: 25px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .order-info-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .order-info-card .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 10px 10px 0 0;
+            padding: 15px 20px;
+        }
+        
+        .order-section {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .order-section h5 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--light-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .table-responsive {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .table thead {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .table th {
+            font-weight: 500;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+        
+        .breadcrumb {
+            background-color: transparent;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+        
+        .breadcrumb-item a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+        
+        .breadcrumb-item.active {
+            color: var(--dark-color);
+        }
+        
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        
+        .status-pendiente {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .status-enviado {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .status-entregado {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .status-cancelado {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .order-details-section {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .order-details-section .col {
+            padding: 10px 15px;
+        }
+        
+        .detail-item {
+            margin-bottom: 10px;
+        }
+        
+        .detail-item .detail-label {
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--dark-color);">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="fas fa-hat-cowboy me-2"></i>JaKaStyle
+            </a>
+            <div class="d-flex align-items-center">
+                <div class="dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button"
+                       data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-1"></i>
+                        <span th:text="${#authentication.name}">Usuario</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user-cog me-2"></i> Perfil</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/usuarios/logout}" method="post" class="dropdown-item p-0">
+                                <button type="submit" class="btn btn-link text-decoration-none w-100 text-start px-3 py-2">
+                                    <i class="fas fa-sign-out-alt me-2"></i> Cerrar sesión
+                                </button>
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/admin/dashboard}">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/admin/productos}">
+                                <i class="fas fa-hat-cowboy"></i> Gorras
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" th:href="@{/admin/ordenes}">
+                                <i class="fas fa-clipboard-list"></i> Órdenes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/admin/usuarios}">
+                                <i class="fas fa-users"></i> Usuarios
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/admin/ordenes}">Órdenes</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Orden #<span th:text="${orden.id}">123</span></li>
+                    </ol>
+                </nav>
+                
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="fw-bold mb-0" style="color: var(--dark-color);">
+                        <i class="fas fa-clipboard-check me-2"></i>Detalles de la Orden #<span th:text="${orden.id}">123</span>
+                    </h2>
+                    <div>
+                        <button class="btn btn-outline-secondary me-2" onclick="window.print()">
+                            <i class="fas fa-print me-1"></i> Imprimir
+                        </button>
+                        <a th:href="@{/admin/ordenes}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left me-1"></i> Volver
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Alertas -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i> <span th:text="${success}">Operación exitosa</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i> <span th:text="${error}">Error en la operación</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <!-- Información General -->
+                <div class="row">
+                    <!-- Información del Cliente y Orden -->
+                    <div class="col-md-8 mb-4">
+                        <div class="order-section">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">Información de la Orden</h5>
+                                <span th:if="${orden.estado.name() == 'PENDIENTE'}" class="status-badge status-pendiente">Pendiente</span>
+                                <span th:if="${orden.estado.name() == 'ENVIADO'}" class="status-badge status-enviado">Enviado</span>
+                                <span th:if="${orden.estado.name() == 'ENTREGADO'}" class="status-badge status-entregado">Entregado</span>
+                                <span th:if="${orden.estado.name() == 'CANCELADO'}" class="status-badge status-cancelado">Cancelado</span>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="detail-item">
+                                        <div class="detail-label">ID de Orden</div>
+                                        <div th:text="${orden.id}">123</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Fecha de Creación</div>
+                                        <div th:text="${#temporals.format(orden.fechaCreacion, 'dd/MM/yyyy HH:mm')}">15/04/2025 10:30</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Total</div>
+                                        <div class="fw-bold fs-5" th:text="${'$' + #numbers.formatDecimal(orden.total, 0, 'POINT', 2, 'COMMA')}">$320.50</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="detail-item">
+                                        <div class="detail-label">Cliente ID</div>
+                                        <div th:text="${orden.usuario.id}">1</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Nombre del Cliente</div>
+                                        <div th:text="${orden.usuario.nombre + ' ' + orden.usuario.apellido}">Juan Pérez</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Email</div>
+                                        <div th:text="${orden.usuario.email}">juan@example.com</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Acciones -->
+                    <div class="col-md-4 mb-4">
+                        <div class="order-section">
+                            <h5>Acciones</h5>
+                            <form th:action="@{/admin/ordenes/actualizar/{id}(id=${orden.id})}" method="post" class="mb-3">
+                                <div class="mb-3">
+                                    <label for="estado-orden" class="form-label">Cambiar Estado</label>
+                                    <select class="form-select" id="estado-orden" name="estado">
+                                        <option value="PENDIENTE" th:selected="${orden.estado.name() == 'PENDIENTE'}">Pendiente</option>
+                                        <option value="ENVIADO" th:selected="${orden.estado.name() == 'ENVIADO'}">Enviado</option>
+                                        <option value="ENTREGADO" th:selected="${orden.estado.name() == 'ENTREGADO'}">Entregado</option>
+                                        <option value="CANCELADO" th:selected="${orden.estado.name() == 'CANCELADO'}">Cancelado</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100 mb-2">
+                                    <i class="fas fa-save me-1"></i> Actualizar Estado
+                                </button>
+                            </form>
+                            <button class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#eliminarOrdenModal">
+                                <i class="fas fa-trash me-1"></i> Eliminar Orden
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Dirección de Envío -->
+                <div class="order-section mb-4">
+                    <h5>Información de Envío</h5>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="detail-item">
+                                <div class="detail-label">Dirección de Envío</div>
+                                <div th:text="${orden.direccionEnvio}">Calle Principal 123, Ciudad, País</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Productos de la Orden -->
+                <div class="order-section">
+                    <h5>Productos en esta Orden</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Producto</th>
+                                    <th class="text-center">Cantidad</th>
+                                    <th class="text-end">Precio Unitario</th>
+                                    <th class="text-end">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="item : ${orden.items}">
+                                    <td th:text="${item.producto.id}">1</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="ms-2">
+                                                <div class="fw-bold" th:text="${item.producto.nombre}">Gorra Negra</div>
+                                                <div class="text-muted small" th:if="${item.producto.descripcion}" th:text="${item.producto.descripcion}">Descripción del producto</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center" th:text="${item.cantidad}">2</td>
+                                    <td class="text-end" th:text="${'$' + #numbers.formatDecimal(item.precioUnitario, 0, 'POINT', 2, 'COMMA')}">$42.00</td>
+                                    <td class="text-end" th:text="${'$' + #numbers.formatDecimal(item.subtotal, 0, 'POINT', 2, 'COMMA')}">$84.00</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="4" class="text-end fw-bold">Total:</td>
+                                    <td class="text-end fw-bold" th:text="${'$' + #numbers.formatDecimal(orden.total, 0, 'POINT', 2, 'COMMA')}">$320.50</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Eliminar Orden -->
+    <div class="modal fade" id="eliminarOrdenModal" tabindex="-1" aria-labelledby="eliminarOrdenModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="eliminarOrdenModalLabel">Eliminar Orden #<span th:text="${orden.id}">123</span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Está seguro que desea eliminar la orden #<span th:text="${orden.id}">123</span>?</p>
+                    <p class="text-danger"><i class="fas fa-exclamation-triangle me-2"></i><strong>Esta acción no se puede deshacer.</strong></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form th:action="@{/admin/ordenes/eliminar/{id}(id=${orden.id})}" method="post">
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

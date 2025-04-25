@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Orden - JakaStyle</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-bg: #f8f9fa;
+            --text-color: #333333;
+            --white: #ffffff;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 1.8rem;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 40px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 3px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--secondary-color);
+        }
+
+        .order-detail-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .order-header {
+            background-color: var(--light-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .order-body {
+            padding: 20px;
+        }
+
+        .order-status {
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-processing {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        .status-shipped {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-delivered {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .order-product-img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .product-item {
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .product-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-item {
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .btn-back {
+            background-color: var(--light-bg);
+            color: var(--primary-color);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-back:hover {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: var(--secondary-color);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -30px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+        }
+
+        .timeline-date {
+            font-size: 0.8rem;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation (igual que en productos_usuarios.html) -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/}">JaKaStyle</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a th:href="@{/productos/productos_usuarios}" class="nav-link"><i class="fas fa-hat-cowboy me-1"></i> Productos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a th:href="@{/ordenes/mis-ordenes}" class="nav-link active"><i class="fas fa-clipboard-list me-1"></i> Mis Órdenes</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <div sec:authorize="isAuthenticated()" class="me-3">
+                        <a th:href="@{/carrito}" class="btn btn-outline-custom position-relative">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span th:if="${carritoCount}" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" th:text="${carritoCount}"></span>
+                        </a>
+                    </div>
+                    <div sec:authorize="isAuthenticated()">
+                        <div class="dropdown">
+                            <button class="btn btn-primary-custom dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user me-1"></i> Mi Cuenta
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item" th:href="@{/usuarios/perfil}">Perfil</a></li>
+                                <li><a class="dropdown-item" th:href="@{/carrito}">Carrito</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" th:href="@{/usuarios/logout}">Cerrar Sesión</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div sec:authorize="isAnonymous()">
+                        <a th:href="@{/usuarios/login}" class="btn btn-primary-custom me-3">
+                            <i class="fas fa-user me-1"></i> Cuenta
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row mb-4">
+            <div class="col-12 d-flex justify-content-between align-items-center">
+                <h1 class="section-title">Detalle de Orden</h1>
+                <a th:href="@{/ordenes/mis-ordenes}" class="btn btn-back">
+                    <i class="fas fa-arrow-left me-2"></i> Volver a Mis Órdenes
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="order-detail-card">
+                    <div class="order-header d-flex justify-content-between align-items-center flex-wrap">
+                        <div class="mb-3 mb-md-0">
+                            <h4 class="mb-1">Orden #<span th:text="${orden.id}"></span></h4>
+                            <small class="text-muted" th:text="${'Fecha: ' + #temporals.format(orden.fechaCreacion, 'dd/MM/yyyy HH:mm')}"></small>
+                        </div>
+                        <div>
+                            <span th:classappend="'order-status status-' + ${orden.estado.toLowerCase()}" 
+                                  th:text="${orden.estado}"></span>
+                        </div>
+                    </div>
+                    <div class="order-body">
+                        <h5 class="mb-4">Productos</h5>
+                        
+                        <div th:each="item : ${orden.items}" class="product-item row align-items-center">
+                            <div class="col-3 col-md-2">
+                                <img th:src="@{'/uploads/' + ${item.producto.imagen}}" 
+                                     class="order-product-img" 
+                                     th:alt="${item.producto.nombre}"
+                                     onerror="this.src='https://via.placeholder.com/80x80?text=Imagen+no+disponible'">
+                            </div>
+                            <div class="col-9 col-md-6">
+                                <h6 th:text="${item.producto.nombre}"></h6>
+                                <small class="text-muted" th:text="${item.producto.descripcion}"></small>
+                            </div>
+                            <div class="col-6 col-md-2 text-center">
+                                <span th:text="${'Cantidad: ' + item.cantidad}"></span>
+                            </div>
+                            <div class="col-6 col-md-2 text-end price">
+                                <span th:text="${'$' + #numbers.formatDecimal(item.subtotal, 1, 'COMMA', 2, 'POINT')}"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-detail-card mt-4">
+                    <div class="order-header">
+                        <h5 class="mb-0">Historial de Estado</h5>
+                    </div>
+                    <div class="order-body">
+                        <div class="timeline">
+                            <div th:each="historial, stat : ${orden.historialEstados}" class="timeline-item">
+                                <h6 th:text="${historial.estado}" th:classappend="'text-' + ${stat.first} ? 'primary' : 'muted'"></h6>
+                                <p class="timeline-date" th:text="${#temporals.format(historial.fechaCambio, 'dd/MM/yyyy HH:mm')}"></p>
+                                <p th:if="${historial.comentario}" th:text="${historial.comentario}" class="text-muted small"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="order-detail-card">
+                    <div class="order-header">
+                        <h5 class="mb-0">Resumen de Orden</h5>
+                    </div>
+                    <div class="order-body">
+                        <div class="summary-item d-flex justify-content-between">
+                            <span>Subtotal:</span>
+                            <span th:text="${'$' + #numbers.formatDecimal(orden.subtotal, 1, 'COMMA', 2, 'POINT')}"></span>
+                        </div>
+                        <div class="summary-item d-flex justify-content-between">
+                            <span>Envío:</span>
+                            <span>$5.00</span>
+                        </div>
+                        <div class="summary-item d-flex justify-content-between fw-bold">
+                            <span>Total:</span>
+                            <span th:text="${'$' + #numbers.formatDecimal(orden.total, 1, 'COMMA', 2, 'POINT')}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-detail-card mt-4">
+                    <div class="order-header">
+                        <h5 class="mb-0">Información de Envío</h5>
+                    </div>
+                    <div class="order-body">
+                        <h6 th:text="${orden.usuario.nombre + ' ' + orden.usuario.apellido}"></h6>
+                        <p th:text="${orden.direccionEnvio}"></p>
+                        <p th:text="${orden.usuario.telefono}"></p>
+                        <p th:text="${orden.usuario.email}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

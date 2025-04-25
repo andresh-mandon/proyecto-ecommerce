@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil | JaKaStyle</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-bg: #f8f9fa;
+            --text-color: #333333;
+            --white: #ffffff;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .navbar-brand {
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+        }
+
+        .nav-link {
+            color: var(--primary-color);
+            margin: 0 10px;
+            transition: color 0.3s;
+            position: relative;
+            font-weight: 500;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--secondary-color);
+            transition: width 0.3s;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-link:hover {
+            color: var(--secondary-color);
+        }
+
+        .navbar-toggler {
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary-custom {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            border: none;
+            transition: all 0.3s;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 500;
+        }
+
+        .btn-primary-custom:hover {
+            background-color: var(--primary-color);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-outline-custom {
+            background-color: transparent;
+            color: var(--secondary-color);
+            border: 2px solid var(--secondary-color);
+            transition: all 0.3s;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 500;
+        }
+
+        .btn-outline-custom:hover {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Profile Section */
+        .profile-section {
+            padding: 100px 0;
+            background-color: var(--white);
+        }
+
+        .profile-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            transition: all 0.3s;
+        }
+
+        .profile-card:hover {
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-icon {
+            font-size: 5rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+        }
+
+        .profile-title {
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .profile-section {
+                padding: 60px 0;
+            }
+            
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/}">JaKaStyle</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a th:href="@{/}" class="nav-link"><i class="fas fa-home me-1"></i> Inicio</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a th:href="@{/productos/productos_usuarios}" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-hat-cowboy me-1"></i> Productos
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" th:href="@{/productos/productos_usuarios(categoriaIds=2)}">Gorras Trucker</a></li>
+                            <li><a class="dropdown-item" th:href="@{/productos/productos_usuarios(categoriaIds=1)}">Gorras Planas</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <!-- Icono del carrito -->
+                    <div sec:authorize="isAuthenticated()" class="me-3">
+                        <a th:href="@{/carrito}" class="btn btn-outline-custom position-relative">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span th:if="${carritoCount}" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" th:text="${carritoCount}"></span>
+                        </a>
+                    </div>
+                    <div sec:authorize="isAuthenticated()">
+                        <div class="dropdown">
+                            <button class="btn btn-primary-custom dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user me-1"></i> <span sec:authentication="name"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item" th:href="@{/usuarios/perfil}">Perfil</a></li>
+                                <li><a class="dropdown-item" th:href="@{/carrito}">Carrito</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" th:href="@{/usuarios/logout}">Cerrar Sesión</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div sec:authorize="isAnonymous()">
+                        <a th:href="@{/usuarios/login}" class="btn btn-primary-custom me-3">
+                            <i class="fas fa-user me-1"></i> Cuenta
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Profile Section -->
+    <section class="profile-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="profile-card">
+                        <div class="profile-header">
+                            <i class="fas fa-user-circle profile-icon"></i>
+                            <h2 class="profile-title">Mi Perfil</h2>
+                        </div>
+
+                        <!-- Mensajes de éxito/error -->
+                        <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                            <span th:text="${success}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                            <span th:text="${error}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="mb-3">
+                                <div class="detail-label">Nombre:</div>
+                                <div class="detail-value" th:text="${usuario.nombre}"></div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="detail-label">Apellido:</div>
+                                <div class="detail-value" th:text="${usuario.apellido}"></div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="detail-label">Email:</div>
+                                <div class="detail-value" th:text="${usuario.email}"></div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="detail-label">Usuario:</div>
+                                <div class="detail-value" th:text="${usuario.nombreUsuario}"></div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="detail-label">Teléfono:</div>
+                                <div class="detail-value" th:text="${usuario.contacto} ?: 'No especificado'"></div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="detail-label">Dirección:</div>
+                                <div class="detail-value" th:text="${usuario.direccion} ?: 'No especificada'"></div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <a th:href="@{/usuarios/editar}" class="btn btn-primary-custom me-3">
+                                <i class="fas fa-edit me-2"></i>Editar Perfil
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <a th:href="@{/}" class="footer-logo">JaKaStyle</a>
+                    <p>Tienda de gorras con estilo y personalidad. Hecho en Barranquilla, Colombia.</p>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="footer-links">
+                        <h5>Productos</h5>
+                        <ul>
+                            <li><a th:href="@{/productos/productos_usuarios(categoriaIds=2)}">Gorras Trucker</a></li>
+                            <li><a th:href="@{/productos/productos_usuarios(categoriaIds=1)}">Gorras Planas</a></li>
+                        </ul>
+                    </div>
+                </div>
+            <div class="copyright">
+                <p>&copy; 2025 JaKaStyle. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 50) {
+                document.querySelector('.navbar').classList.add('scrolled');
+            } else {
+                document.querySelector('.navbar').classList.remove('scrolled');
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

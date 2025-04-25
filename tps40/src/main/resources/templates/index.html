@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JaKaStyle - Tienda de Gorras | Barranquilla, Colombia</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-bg: #f8f9fa;
+            --text-color: #333333;
+            --white: #ffffff;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .navbar-brand {
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+        }
+
+        .nav-link {
+            color: var(--primary-color);
+            margin: 0 10px;
+            transition: color 0.3s;
+            position: relative;
+            font-weight: 500;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--secondary-color);
+            transition: width 0.3s;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-link:hover {
+            color: var(--secondary-color);
+        }
+
+        .navbar-toggler {
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary-custom {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            border: none;
+            transition: all 0.3s;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 500;
+        }
+
+        .btn-primary-custom:hover {
+            background-color: var(--primary-color);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-outline-custom {
+            background-color: transparent;
+            color: var(--secondary-color);
+            border: 2px solid var(--secondary-color);
+            transition: all 0.3s;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 500;
+        }
+
+        .btn-outline-custom:hover {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), 
+                        url('https://images.unsplash.com/photo-1521369909029-2afed882baee?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center;
+            background-size: cover;
+            padding: 150px 0;
+            position: relative;
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            animation: fadeInDown 1s ease;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            color: var(--text-color);
+            animation: fadeIn 1.5s ease;
+        }
+
+        /* Featured Categories */
+        .categories-section {
+            padding: 80px 0;
+            background-color: var(--light-bg);
+        }
+
+        .category-card {
+            background-color: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.5s ease;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            position: relative;
+            height: 250px;
+            border: 1px solid var(--border-color);
+        }
+
+        .category-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-color: var(--secondary-color);
+        }
+
+        .category-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .category-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .category-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+            padding: 20px;
+            color: white;
+        }
+
+        /* Products Section */
+        .products-section {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 40px;
+            text-align: center;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            width: 50%;
+            height: 3px;
+            bottom: 0;
+            left: 25%;
+            background: linear-gradient(90deg, transparent, var(--secondary-color), transparent);
+        }
+
+        .product-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.5s ease;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-color: var(--secondary-color);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .product-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .product-card .card-body {
+            padding: 20px;
+        }
+
+        .product-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .product-price {
+            color: var(--accent-color);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .badge-new {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--accent-color);
+            color: var(--white);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        /* About Section */
+        .about-section {
+            padding: 80px 0;
+            background-color: var(--light-bg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center;
+            background-size: cover;
+            opacity: 0.05;
+            z-index: 1;
+        }
+
+        .about-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .about-title {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--primary-color);
+            padding: 60px 0 20px;
+            color: var(--white);
+            position: relative;
+        }
+
+        .footer-logo {
+            color: var(--white);
+            font-weight: bold;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .footer-links h5 {
+            color: var(--white);
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-links h5::after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--secondary-color);
+        }
+
+        .footer-links ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .copyright {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-section {
+                min-height: 60vh;
+                text-align: center;
+            }
+            
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/}">JaKaStyle</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a th:href="@{/}" class="nav-link active"><i class="fas fa-home me-1"></i> Inicio</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a th:href="@{/productos/productos_usuarios}" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-hat-cowboy me-1"></i> Productos
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" th:href="@{/productos/productos_usuarios(categoriaIds=2)}">Gorras Trucker</a></li>
+                            <li><a class="dropdown-item" th:href="@{/productos/productos_usuarios(categoriaIds=1)}">Gorras Planas</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contacto"><i class="fas fa-envelope me-1"></i> Contáctanos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#nosotros"><i class="fas fa-info-circle me-1"></i> Sobre Nosotros</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <!-- Icono del carrito -->
+                    <div sec:authorize="isAuthenticated()" class="me-3">
+                        <a th:href="@{/carrito}" class="btn btn-outline-custom position-relative">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span th:if="${carritoCount}" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" th:text="${carritoCount}"></span>
+                        </a>
+                    </div>
+                    <div sec:authorize="isAuthenticated()">
+                        <div class="dropdown">
+                            <button class="btn btn-primary-custom dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user me-1"></i> Mi Cuenta
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item" th:href="@{/usuarios/perfil}">Perfil</a></li>
+                                <li><a class="dropdown-item" th:href="@{/carrito}">Carrito</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" th:href="@{/usuarios/logout}">Cerrar Sesión</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div sec:authorize="isAnonymous()">
+                        <a th:href="@{/usuarios/login}" class="btn btn-primary-custom me-3">
+                            <i class="fas fa-user me-1"></i> Inicia Sesion 
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="hero-title">Encuentra tu estilo con JaKaStyle</h1>
+                    <p class="hero-subtitle">Las mejores gorras con diseños exclusivos hechos en Barranquilla, Colombia</p>
+                    <a href="#productos" class="btn btn-primary-custom btn-lg me-2">Ver Colección</a>
+                    <a href="#nosotros" class="btn btn-outline-custom btn-lg">Conócenos</a>
+                </div>
+                <div class="col-lg-6 d-none d-lg-block">
+                    <img src="https://images.unsplash.com/photo-1521369909029-2afed882baee?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80" alt="Modelo con gorra JaKaStyle" class="img-fluid rounded shadow-lg floating">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Categories -->
+    <section id="categorias" class="categories-section">
+        <div class="container">
+            <h2 class="section-title text-center mb-5">Nuestras Categorías</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="category-card">
+                        <img src="https://i.pinimg.com/736x/c1/f5/a4/c1f5a41961baf7440c92d6ee3a5efd25.jpg" alt="Gorras Trucker">
+                        <div class="category-overlay">
+                            <h3>Trucker</h3>
+                            <a th:href="@{/productos/productos_usuarios(categoriaIds=2)}" class="btn btn-primary-custom">Ver Colección</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="category-card">
+                        <img src="https://i.pinimg.com/736x/95/a3/13/95a31362b2db9a4060770e4bc6c7e3da.jpg" alt="Gorras Planas">
+                        <div class="category-overlay">
+                            <h3>Planas</h3>
+                            <a th:href="@{/productos/productos_usuarios(categoriaIds=1)}" class="btn btn-primary-custom">Ver Colección</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section id="productos" class="products-section">
+        <div class="container">
+            <h2 class="section-title text-center mb-5">Productos Destacados</h2>
+            <div class="row">
+                <!-- Producto 1 -->
+                <div class="col-md-4" th:if="${producto1}">
+                    <div class="product-card">
+                        <span class="badge-new">Nuevo</span>
+                        <img th:src="@{/uploads/{nombreImagen}(nombreImagen=${producto1.imagen})}" 
+                             alt="Imagen del producto" 
+                             class="img-fluid"
+                             th:onerror="this.src='https://via.placeholder.com/300x300?text=Imagen+no+disponible'">
+                        <div class="card-body">
+                            <h3 class="product-title" th:text="${producto1.nombre}"></h3>
+                            <p class="text-muted" th:text="${producto1.categoria.nombre}"></p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="product-price" th:text="'$' + ${#numbers.formatDecimal(producto1.precio, 1, 'COMMA', 2, 'POINT')}"></span>
+                                <a th:href="@{/productos/productos_usuarios(categoriaIds=${producto1.categoria.id})}" class="btn btn-primary-custom btn-sm">Ver más</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Producto 2 -->
+                <div class="col-md-4" th:if="${producto2}">
+                    <div class="product-card">
+                        <img th:src="@{/uploads/{nombreImagen}(nombreImagen=${producto2.imagen})}" 
+                             alt="Imagen del producto" 
+                             class="img-fluid"
+                             th:onerror="this.src='https://via.placeholder.com/300x300?text=Imagen+no+disponible'">
+                        <div class="card-body">
+                            <h3 class="product-title" th:text="${producto2.nombre}"></h3>
+                            <p class="text-muted" th:text="${producto2.categoria.nombre}"></p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="product-price" th:text="'$' + ${#numbers.formatDecimal(producto2.precio, 1, 'COMMA', 2, 'POINT')}"></span>
+                                <a th:href="@{/productos/productos_usuarios(categoriaIds=${producto2.categoria.id})}" class="btn btn-primary-custom btn-sm">Ver más</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Producto 3 -->
+                <div class="col-md-4" th:if="${producto3}">
+                    <div class="product-card">
+                        <span class="badge-new">Más vendido</span>
+                        <img th:src="@{/uploads/{nombreImagen}(nombreImagen=${producto3.imagen})}" 
+                             alt="Imagen del producto" 
+                             class="img-fluid"
+                             th:onerror="this.src='https://via.placeholder.com/300x300?text=Imagen+no+disponible'">
+                        <div class="card-body">
+                            <h3 class="product-title" th:text="${producto3.nombre}"></h3>
+                            <p class="text-muted" th:text="${producto3.categoria.nombre}"></p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="product-price" th:text="'$' + ${#numbers.formatDecimal(producto3.precio, 1, 'COMMA', 2, 'POINT')}"></span>
+                                <a th:href="@{/productos/productos_usuarios(categoriaIds=${producto3.categoria.id})}" class="btn btn-primary-custom btn-sm">Ver más</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <a th:href="@{/productos/productos_usuarios}" class="btn btn-outline-custom">Ver todos los productos</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="nosotros" class="about-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <img src="https://i.pinimg.com/736x/78/ed/cf/78edcf2fed132085bd9d21f45cbba83c.jpg" alt="Equipo JaKaStyle" class="img-fluid rounded shadow-lg">
+                </div>
+                <div class="col-lg-6 about-content">
+                    <h2 class="about-title">Sobre JaKaStyle</h2>
+                    <p>Somos una pequeña empresa emergente de Barranquilla, creada en 2025 con la pasión por el diseño y la moda urbana. En JaKaStyle nos especializamos en la creación de gorras con estilo y personalidad.</p>
+                    <p>Comenzamos como un pequeño emprendimiento y hoy nos enorgullece ofrecer productos de calidad que representan la esencia caribeña. Cada gorra es fabricada con atención al detalle y materiales seleccionados cuidadosamente.</p>
+                    <p>Nuestro objetivo es crecer junto a nuestros clientes, ofreciendo diseños únicos que complementen su estilo personal.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contacto" class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2 class="section-title mb-4">Contáctanos</h2>
+                    <p>¿Tienes alguna pregunta o comentario? Estamos aquí para ayudarte.</p>
+                    <ul class="list-unstyled mt-4">
+                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> Barranquilla, Colombia</li>
+                        <li class="mb-2"><i class="fas fa-phone me-2"></i> +57 300 123 4567</li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i> info@jakastyle.com</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <a th:href="@{/}" class="footer-logo">JaKaStyle</a>
+                    <p>Tienda de gorras con estilo y personalidad. Hecho en Barranquilla, Colombia.</p>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="footer-links">
+                        <h5>Productos</h5>
+                        <ul>
+                            <li><a th:href="@{/productos/productos_usuarios(categoriaIds=2)}">Gorras Trucker</a></li>
+                            <li><a th:href="@{/productos/productos_usuarios(categoriaIds=1)}">Gorras Planas</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="footer-links">
+                        <h5>Empresa</h5>
+                        <ul>
+                            <li><a href="#nosotros">Sobre Nosotros</a></li>
+                            <li><a href="#">Términos y Condiciones</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 JaKaStyle. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 50) {
+                document.querySelector('.navbar').classList.add('scrolled');
+            } else {
+                document.querySelector('.navbar').classList.remove('scrolled');
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

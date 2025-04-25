@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Términos y Condiciones | JaKaStyle</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-bg: #f8f9fa;
+            --text-color: #333333;
+            --white: #ffffff;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .navbar-brand {
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+        }
+
+        .nav-link {
+            color: var(--primary-color);
+            margin: 0 10px;
+            transition: color 0.3s;
+            position: relative;
+            font-weight: 500;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--secondary-color);
+            transition: width 0.3s;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-link:hover {
+            color: var(--secondary-color);
+        }
+
+        .navbar-toggler {
+            border-color: var(--primary-color);
+        }
+
+        /* Terms Section */
+        .terms-section {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+
+        .terms-container {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .terms-title {
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .terms-title::after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 3px;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--secondary-color);
+        }
+
+        .terms-subtitle {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin: 25px 0 15px;
+        }
+
+        .terms-text {
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        .terms-list {
+            padding-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        .terms-list li {
+            margin-bottom: 10px;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .terms-section {
+                padding: 50px 0;
+            }
+            
+            .terms-container {
+                padding: 25px;
+            }
+            
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/}">JaKaStyle</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a th:href="@{/}" class="nav-link"><i class="fas fa-home me-1"></i> Inicio</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a th:href="@{/productos/productos_usuarios}" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-hat-cowboy me-1"></i> Productos
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" th:href="@{/productos/productos_usuarios(categoriaIds=1)}">Gorras Trucker</a></li>
+                            <li><a class="dropdown-item" th:href="@{/productos/productos_usuarios(categoriaIds=2)}">Gorras Planas</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#nosotros"><i class="fas fa-info-circle me-1"></i> Sobre Nosotros</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <!-- Icono del carrito -->
+                    <div sec:authorize="isAuthenticated()" class="me-3">
+                        <a th:href="@{/carrito}" class="btn btn-outline-custom position-relative">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span th:if="${carritoCount}" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" th:text="${carritoCount}"></span>
+                        </a>
+                    </div>
+                    <div sec:authorize="isAuthenticated()">
+                        <div class="dropdown">
+                            <button class="btn btn-primary-custom dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user me-1"></i> <span sec:authentication="name"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item" th:href="@{/usuarios/perfil}">Perfil</a></li>
+                                <li><a class="dropdown-item" th:href="@{/carrito}">Carrito</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" th:href="@{/usuarios/logout}">Cerrar Sesión</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div sec:authorize="isAnonymous()">
+                        <a th:href="@{/usuarios/login}" class="btn btn-primary-custom me-3">
+                            <i class="fas fa-user me-1"></i> Cuenta
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Terms Section -->
+    <section class="terms-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="terms-container">
+                        <h1 class="terms-title">Términos y Condiciones de JaKaStyle</h1>
+                        
+                        <p class="terms-text">Bienvenido a JaKaStyle. Estos términos y condiciones describen las reglas y regulaciones para el uso de nuestro sitio web y la compra de nuestros productos.</p>
+                        
+                        <p class="terms-text"><strong>Última actualización:</strong> 24 de abril de 2025</p>
+                        
+                        <h3 class="terms-subtitle">1. Aceptación de los Términos</h3>
+                        <p class="terms-text">Al acceder y utilizar este sitio web, usted acepta estar sujeto a estos términos y condiciones. Si no está de acuerdo con alguno de estos términos, no podrá utilizar nuestro sitio.</p>
+                        
+                        <h3 class="terms-subtitle">2. Información del Usuario</h3>
+                        <p class="terms-text">Para realizar compras en nuestro sitio, deberá registrarse proporcionando información veraz, exacta y completa. Usted es responsable de mantener la confidencialidad de su cuenta y contraseña.</p>
+                        
+                        <h3 class="terms-subtitle">3. Productos y Precios</h3>
+                        <p class="terms-text">Todos los productos están sujetos a disponibilidad. Nos reservamos el derecho de limitar las cantidades vendidas a cada persona y de rechazar pedidos sin previo aviso.</p>
+                        <p class="terms-text">Los precios de nuestros productos están sujetos a cambios sin previo aviso. Nos reservamos el derecho de modificar o discontinuar productos en cualquier momento.</p>
+                        
+                        <h3 class="terms-subtitle">4. Métodos de Pago</h3>
+                        <p class="terms-text">Aceptamos los siguientes métodos de pago:</p>
+                        <ul class="terms-list">
+                            <li>Tarjetas de crédito/débito (Visa, MasterCard, American Express)</li>
+                            <li>Transferencias bancarias</li>
+                            <li>Pago contra entrega (solo en Barranquilla)</li>
+                        </ul>
+                        
+                        <h3 class="terms-subtitle">5. Envíos y Entregas</h3>
+                        <p class="terms-text">Los tiempos de entrega varían según la ubicación y el método de envío seleccionado. No nos hacemos responsables por retrasos causados por terceros (empresas de transporte).</p>
+                        <p class="terms-text">Los costos de envío se calcularán al momento de realizar el pedido y son responsabilidad del cliente.</p>
+                        
+                        <h3 class="terms-subtitle">6. Devoluciones y Reembolsos</h3>
+                        <p class="terms-text">Aceptamos devoluciones dentro de los 15 días posteriores a la recepción del producto. Para ser elegible para una devolución:</p>
+                        <ul class="terms-list">
+                            <li>El producto debe estar en su estado original, sin usar y con todas las etiquetas</li>
+                            <li>Debe incluirse el recibo o prueba de compra</li>
+                        </ul>
+                        <p class="terms-text">Los reembolsos se procesarán dentro de los 10 días hábiles posteriores a la recepción y aprobación de la devolución.</p>
+                        
+                        <h3 class="terms-subtitle">7. Propiedad Intelectual</h3>
+                        <p class="terms-text">Todo el contenido del sitio web (textos, gráficos, logos, imágenes) es propiedad de JaKaStyle y está protegido por las leyes de propiedad intelectual.</p>
+                        
+                        <h3 class="terms-subtitle">8. Limitación de Responsabilidad</h3>
+                        <p class="terms-text">JaKaStyle no será responsable por daños indirectos, incidentales o consecuentes que resulten del uso o la imposibilidad de uso de nuestros productos.</p>
+                        
+                        <h3 class="terms-subtitle">9. Modificaciones</h3>
+                        <p class="terms-text">Nos reservamos el derecho de modificar estos términos y condiciones en cualquier momento. Los cambios entrarán en vigor inmediatamente después de su publicación en el sitio.</p>
+                        
+                        <h3 class="terms-subtitle">10. Ley Aplicable</h3>
+                        <p class="terms-text">Estos términos se regirán e interpretarán de acuerdo con las leyes de Colombia. Cualquier disputa estará sujeta a la jurisdicción exclusiva de los tribunales de Barranquilla.</p>
+                        
+                        <h3 class="terms-subtitle">Contacto</h3>
+                        <p class="terms-text">Si tiene preguntas sobre estos términos y condiciones, puede contactarnos:</p>
+                        <ul class="terms-list">
+                            <li>Por email: info@jakastyle.com</li>
+                            <li>Por teléfono: +57 300 123 4567</li>
+                            <li>Por correo: Calle 5 #10-20, Barranquilla, Colombia</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <a th:href="@{/}" class="footer-logo">JaKaStyle</a>
+                    <p>Tienda de gorras con estilo y personalidad. Hecho en Barranquilla, Colombia.</p>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="footer-links">
+                        <h5>Productos</h5>
+                        <ul>
+                            <li><a th:href="@{/productos/productos_usuarios(categoriaIds=1)}">Gorras Trucker</a></li>
+                            <li><a th:href="@{/productos/productos_usuarios(categoriaIds=2)}">Gorras Planas</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="footer-links">
+                        <h5>Empresa</h5>
+                        <ul>
+                            <li><a href="#nosotros">Sobre Nosotros</a></li>
+                            <li><a th:href="@{/terminos}">Términos y Condiciones</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 JaKaStyle. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 50) {
+                document.querySelector('.navbar').classList.add('scrolled');
+            } else {
+                document.querySelector('.navbar').classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>

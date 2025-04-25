@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Órdenes - JakaStyle</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-bg: #f8f9fa;
+            --text-color: #333333;
+            --white: #ffffff;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 1.8rem;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 40px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 3px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--secondary-color);
+        }
+
+        .order-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .order-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-color: var(--secondary-color);
+        }
+
+        .order-header {
+            background-color: var(--light-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .order-body {
+            padding: 15px;
+        }
+
+        .order-status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-processing {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        .status-shipped {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-delivered {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .order-product-img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-details {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-details:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-orders {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-orders i {
+            font-size: 5rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation (igual que en productos_usuarios.html) -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/}">JaKaStyle</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a th:href="@{/productos/productos_usuarios}" class="nav-link"><i class="fas fa-hat-cowboy me-1"></i> Productos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a th:href="@{/ordenes/mis-ordenes}" class="nav-link active"><i class="fas fa-clipboard-list me-1"></i> Mis Órdenes</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <div sec:authorize="isAuthenticated()" class="me-3">
+                        <a th:href="@{/carrito}" class="btn btn-outline-custom position-relative">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span th:if="${carritoCount}" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" th:text="${carritoCount}"></span>
+                        </a>
+                    </div>
+                    <div sec:authorize="isAuthenticated()">
+                        <div class="dropdown">
+                            <button class="btn btn-primary-custom dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user me-1"></i> Mi Cuenta
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item" th:href="@{/usuarios/perfil}">Perfil</a></li>
+                                <li><a class="dropdown-item" th:href="@{/carrito}">Carrito</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" th:href="@{/usuarios/logout}">Cerrar Sesión</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div sec:authorize="isAnonymous()">
+                        <a th:href="@{/usuarios/login}" class="btn btn-primary-custom me-3">
+                            <i class="fas fa-user me-1"></i> Cuenta
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="section-title">Mis Órdenes</h1>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(ordenes)}" class="empty-orders">
+            <i class="fas fa-clipboard-list"></i>
+            <h2>No tienes órdenes registradas</h2>
+            <p class="mb-4">Cuando realices un pedido, aparecerá en esta sección.</p>
+            <a th:href="@{/productos/productos_usuarios}" class="btn btn-primary-custom">Explorar productos</a>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(ordenes)}" class="row">
+            <div class="col-12" th:each="orden : ${ordenes}">
+                <div class="order-card">
+                    <div class="order-header d-flex justify-content-between align-items-center flex-wrap">
+                        <div class="mb-2 mb-md-0">
+                            <h5 class="mb-1">Orden #<span th:text="${orden.id}"></span></h5>
+                            <small class="text-muted" th:text="${'Fecha: ' + #temporals.format(orden.fechaCreacion, 'dd/MM/yyyy HH:mm')}"></small>
+                        </div>
+                        <div>
+                            <span th:classappend="'order-status status-' + ${orden.estado.toLowerCase()}" 
+                                  th:text="${orden.estado}"></span>
+                        </div>
+                    </div>
+                    <div class="order-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Productos:</h6>
+                                <div class="d-flex align-items-center mb-2" th:each="item : ${orden.items}">
+                                    <img th:src="@{'/uploads/' + ${item.producto.imagen}}" 
+                                         class="order-product-img me-3" 
+                                         th:alt="${item.producto.nombre}"
+                                         onerror="this.src='https://via.placeholder.com/60x60?text=Imagen+no+disponible'">
+                                    <div>
+                                        <p class="mb-0" th:text="${item.producto.nombre}"></p>
+                                        <small class="text-muted" th:text="${'Cantidad: ' + item.cantidad}"></small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Subtotal:</span>
+                                    <span th:text="${'$' + #numbers.formatDecimal(orden.subtotal, 1, 'COMMA', 2, 'POINT')}"></span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Envío:</span>
+                                    <span>$5.00</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-3 fw-bold">
+                                    <span>Total:</span>
+                                    <span th:text="${'$' + #numbers.formatDecimal(orden.total, 1, 'COMMA', 2, 'POINT')}"></span>
+                                </div>
+                                <a th:href="@{/ordenes/{id}(id=${orden.id})}" class="btn btn-details w-100">
+                                    <i class="fas fa-eye me-2"></i> Ver Detalles
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

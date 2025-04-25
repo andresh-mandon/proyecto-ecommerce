@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Pedidos - JakaStyle App</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: calc(100vh - 56px);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .nav-link {
+            color: #495057;
+            border-radius: 0;
+            padding: 0.75rem 1rem;
+        }
+        .nav-link:hover, .nav-link.active {
+            background-color: #f8f9fa;
+            color: #0d6efd;
+        }
+        .nav-link i {
+            margin-right: 10px;
+        }
+        .content-section {
+            padding: 20px;
+        }
+        .order-card {
+            transition: transform 0.3s;
+        }
+        .order-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        @media (max-width: 767.98px) {
+            .sidebar {
+                min-height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">JakaStyle App</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fas fa-shopping-cart"></i> Tienda</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle"></i> <span th:text="${usuario.nombreUsuario}">Usuario</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" th:href="@{/usuario/perfil}"><i class="fas fa-user"></i> Mi Perfil</a></li>
+                        <li><a class="dropdown-item" th:href="@{/usuario/ordenes}"><i class="fas fa-shopping-bag"></i> Mis Pedidos</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 px-0 bg-light sidebar">
+            <div class="d-flex flex-column p-3">
+                <div class="text-center mb-4">
+                    <h5 th:text="${usuario.nombre + ' ' + usuario.apellido}">Nombre Usuario</h5>
+                </div>
+                <ul class="nav nav-pills flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/usuario/perfil}">
+                            <i class="fas fa-user"></i> Mi Perfil
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/usuario/ordenes}">
+                            <i class="fas fa-shopping-bag"></i> Mis Pedidos
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10 content-section">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="mb-4">Mis Pedidos</h2>
+
+                    <div class="alert alert-info" th:if="${#lists.isEmpty(ordenes)}">
+                        <i class="fas fa-info-circle"></i> No tienes pedidos realizados todavía.
+                    </div>
+
+                    <div class="row" th:unless="${#lists.isEmpty(ordenes)}">
+                        <div class="col-lg-6 mb-4" th:each="orden : ${ordenes}">
+                            <div class="card order-card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <span th:text="'Pedido #' + ${orden.id}">Pedido #123</span>
+                                    <span class="badge"
+                                          th:classappend="${orden.estado == T(com.tps40.tps40.Entities.Orden.EstadoOrden).PENDIENTE ? 'bg-warning' :
+                                                           (orden.estado == T(com.tps40.tps40.Entities.Orden.EstadoOrden).ENVIADO ? 'bg-info' :
+                                                           (orden.estado == T(com.tps40.tps40.Entities.Orden.EstadoOrden).ENTREGADO ? 'bg-success' : 'bg-danger'))}"
+                                          th:text="${orden.estado}">PENDIENTE</span>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <strong>Fecha:</strong> <span th:text="${#temporals.format(orden.fechaCreacion, 'dd/MM/yyyy HH:mm')}">01/01/2025 14:30</span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <strong>Dirección de entrega:</strong> <span th:text="${orden.direccionEnvio}">Calle Ejemplo 123</span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <strong>Productos:</strong>
+                                        <ul class="list-group list-group-flush mt-2">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center" th:each="item : ${orden.items}">
+                                                <span th:text="${item.producto.nombre + ' x' + item.cantidad}">Producto x 1</span>
+                                                <span th:text="${'$' + item.precio}">$100.00</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="card-footer d-flex justify-content-between align-items-center">
+                                    <span><strong>Total:</strong> <span th:text="${'$' + orden.total}">$100.00</span></span>
+                                    <button class="btn btn-sm btn-outline-primary"
+                                            th:if="${orden.estado == T(com.tps40.tps40.Entities.Orden.EstadoOrden).PENDIENTE}"
+                                            th:data-order-id="${orden.id}">Cancelar Pedido</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast para notificaciones -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+    <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">Notificación</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            <!-- Mensaje dinámico -->
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Script para mostrar notificaciones
+    function showNotification(message, type = 'success') {
+        const toastEl = document.getElementById('liveToast');
+        const toastBody = toastEl.querySelector('.toast-body');
+
+        // Configurar el mensaje
+        toastBody.textContent = message;
+
+        // Configurar el tipo de notificación
+        toastEl.className = 'toast';
+        if (type === 'success') {
+            toastBody.style.backgroundColor = '#d1e7dd';
+        } else if (type === 'error') {
+            toastBody.style.backgroundColor = '#f8d7da';
+        } else if (type === 'warning') {
+            toastBody.style.backgroundColor = '#fff3cd';
+        }
+
+        // Mostrar la notificación
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+    }
+
+    // Comprobar si hay un mensaje de éxito o error en la URL
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const successMsg = urlParams.get('success');
+        const errorMsg = urlParams.get('error');
+
+        if (successMsg) {
+            showNotification(successMsg, 'success');
+        } else if (errorMsg) {
+            showNotification(errorMsg, 'error');
+        }
+
+        // Manejar cancelación de pedidos
+        document.querySelectorAll('[data-order-id]').forEach(button => {
+            button.addEventListener('click', function() {
+                const orderId = this.getAttribute('data-order-id');
+                if (confirm('¿Estás seguro de que deseas cancelar este pedido?')) {
+                    // Aquí se puede añadir la lógica para cancelar el pedido mediante fetch o form
+                    fetch(`/usuario/cancelar-orden/${orderId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]')?.getAttribute('content')
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                showNotification('Pedido cancelado correctamente', 'success');
+                                setTimeout(() => location.reload(), 1500);
+                            } else {
+                                showNotification('Error al cancelar el pedido', 'error');
+                            }
+                        })
+                        .catch(error => {
+                            showNotification('Error en la solicitud', 'error');
+                        });
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
